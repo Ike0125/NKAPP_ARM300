@@ -1,0 +1,33 @@
+# Pythonバイトコード
+__pycache__/
+*.py[cod]
+
+# 環境設定
+.env
+venv/
+env/
+
+# 参考文書
+notebooks/
+
+# Jupyter Notebookのチェックポイント
+.ipynb_checkpoints/
+
+# IDE関連のファイル
+.vscode/
+.idea/
+
+# ログファイル
+*.log
+logs/
+
+#DataBase
+data/
+.db
+
+.json
+
+# テスト用
+Start_NKsys.bat
+Start_NKsys.lnk
+sample.py

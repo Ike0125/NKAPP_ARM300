@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tests Control</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>テスト管理画面</h1>
+    <h2>/tests</h2>
+    <ul>
+        <li><a href="{{ url_for('tests.test1') }}">test1</a></li><BR>
+        <li><a href="{{ url_for('tests.sample') }}">sample</a></li><BR>
+        <li><a href="{{ url_for('tests.dropindex') }}">Dropdown List</a></li><BR>
+            </ul>
+    <p>ここでは、テストプログラムを登録しています。</p>
+    <a href="{{ url_for('.index') }}">メインメニューに戻る</a>
+</body>
+</html>

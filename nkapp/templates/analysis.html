@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>サイドバー付きページ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base3.css') }}">
+</head>
+<body>
+    <div class="sidebar">
+        <ul>
+            <BR><BR>
+            <li><a href="#">メニュー 1</a></li>
+            <li><a href="#">メニュー 2</a></li>
+            <li><a href="#">メニュー 3</a></li>
+            <li><a href="#">メニュー 4</a></li>
+            <BR><BR><BR>
+            <a href="javascript:history.back()">Previous</a>
+            <BR><BR>
+            <a href="{{ url_for('.index') }}">Home</a>
+
+        </ul>
+    </div>
+    <div class="main-content">
+        <header>
+            <h1>メインコンテンツのヘッダー</h1>
+        </header>
+        <section>
+            <p>ここにメインコンテンツを配置します。サイドバーとともにページ全体がレイアウトされます。</p>
+            <p>ここにメインコンテンツを配置します。サイドバーとともにページ全体がレイアウトされます。</p>
+            <p>ここにメインコンテンツを配置します。サイドバーとともにページ全体がレイアウトされます。</p>
+            <p>ここにメインコンテンツを配置します。サイドバーとともにページ全体がレイアウトされます。</p>
+            <p>ここにメインコンテンツを配置します。サイドバーとともにページ全体がレイアウトされます。</p>
+            <p>ここにメインコンテンツを配置します。サイドバーとともにページ全体がレイアウトされます。</p>
+            <p>ここにメインコンテンツを配置します。サイドバーとともにページ全体がレイアウトされます。</p>
+
+        </section>
+        <footer>
+            <p>analysis</p>
+            <p>© 2024 SWFSOMA013 All Rights Reserved.</p>
+            <p> {{ current_time }}</p>
+        </footer>
+    </div>
+</body>
+</html>

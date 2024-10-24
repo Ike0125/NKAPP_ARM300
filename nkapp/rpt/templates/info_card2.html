@@ -1,0 +1,85 @@
+<<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ head_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base3.css') }}">
+    <style>
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            width: 300px;
+            height: 600px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card h3 {
+            margin-top: 0;
+            font-size: 1.2em;
+        }
+        .card p {
+            margin: 8px 0;
+        }
+        .large-card {
+            width: 700px;
+            height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <header>
+            <h2>{{ header_title }}</h2>
+            <p>
+                {% set end = page * per_page %}
+                {% if end > total_records %}
+                    {% set end = total_records %}
+                {% endif %}
+                全{{ total_records }}件中 {{ (page - 1) * per_page + 1 }}-{{ end }}件目を表示
+            </p>
+        </header>
+        {% if db_data == [] %}
+            <p>該当するデータが見つかりません。</p>
+            <a href="javascript:history.back()">Previous</a>
+        {% else %}
+            <div class="card-container">
+                {% for db in db_data %}
+                    <div class="card">
+                        <a href="{{ url_for('rpt.tstock_query11', code=db.code) }}" class="card">
+                        <h3>{{ db.companyname }}</h3>
+                        </a>
+                        <p><strong>銘柄コード:</strong> {{ db.code }}</p>
+                        <p><strong>会社名英語:</strong> {{ db.companynameenglish }}</p>
+                        <p><strong>情報適用年月日:</strong> {{ db.date }}</p>
+                        <p><strong>17業種コード:</strong> {{ db.sector17code }} - {{ db.sector17codename }}</p>
+                        <p><strong>33業種コード:</strong> {{ db.sector33code }} - {{ db.sector33codename }}</p>
+                        <p><strong>規模コード:</strong> {{ db.scalecategory }}</p>
+                        <p><strong>市場区分:</strong> {{ db.marketcode }} - {{ db.marketcodename }}</p>
+                        <a href="javascript:history.back()">Previous</a>
+                    </div>
+                {% endfor %}
+                <div class="card large-card">
+                    <img src="data:image/png;base64,{{ graph }}" alt="Candle Chart" style="max-width:100%;">
+                </div>
+            </div>
+        {% endif %}
+        <footer>
+            <a href="javascript:history.back()">Previous</a>
+            <p>© 2024 SWFSOMA013 All Rights Reserved.</p>
+            <p>{{ current_time }}</p>
+        </footer>
+    </div>
+</body>
+</html>

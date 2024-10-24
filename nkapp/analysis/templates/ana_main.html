@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reports</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/base3.css') }}"
+    />
+    <style>
+      .card-container {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 20px;
+          justify-content: flex-end;
+      }
+      .card {
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 16px;
+          margin-top: 100px;
+          margin-right: 10px;
+          margin-bottom: 100px;
+          width: 400px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          text-decoration: none;
+          color: inherit;
+          transition: transform 0.2s;
+      }
+      .card h3 {
+          margin-top: 0;
+          font-size: 1.2em;
+      }
+      .card p {
+          margin: 8px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidebar">
+      <ul>
+        <br><br>
+        <li><a href={{ url_for('analysis.analysis_query') }}>分析</a></li>
+        <li><a href="#">主力指標</a></li>
+        <li><a href="#">銘柄一覧</a></li>
+        <li><a href="#">各種レポート</a></li>
+        <br><br><br>
+        <a href="javascript:history.back()">Previous</a>
+        <br><br>
+        <a href="{{ url_for('nkapp.index') }}">Home</a>
+        <br><br><br><br><br><br><br><br><br><br><br><br>
+        <a
+          href="https://jpx-jquants.com/auth/signin"
+          target="_blank"
+          rel="noopener noreferrer"
+          >J-Quontes</a
+        ><br>
+        <br>
+        <a href="https://chatgpt.com/g/g-qSdKOpRki-webahuri-nksys-zuo-cheng"
+        target="_blank" rel="noopener noreferrer"
+          >ChatGPT</a
+        ><br>
+        <br>
+        <a
+          href="https://www.perplexity.ai/"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Perplexity</a
+        ><br>
+      </ul>
+    </div>
+    <div class="main-content">
+      <header>
+        <h1>Analysis</h1>
+      </header>
+      <section>
+        <h2>Database:{{ current_db }}</h2>
+        <h4>Table1: listed_info</h4>
+          <p>
+            DB: Last Updated: {{ last_update_info }} ; {{ record_count_info }}
+            records
+          </p>
+          <br>
+        <h4>Table2: Daily_Quotes_All</h4>
+          <p>
+            DB: Last Updated: {{ last_update_all }} ; {{ record_count_all }}
+            records
+          </p>
+          <br>
+        <form action="{{ url_for(endpoint) }}" method="get">
+          <label for="companyname"> 会社名:</label>
+          <input type="text" name="companyname" value={{companyname_query}} ></input>
+          <button type="submit">Search</button>
+        </form>
+        <br>
+        <p> Filter1/info:</p>
+        <form action="{{ url_for('analysis.filter1') }}" method="get">
+          <textarea name="filter1" id="filter1" rows="3" style="width: 350px; resize: vertical;" value={{filter1}}></textarea>
+          <button type="submit">Search</button>
+        </form>
+        <p> exp. listed_info.code = "15700" </p>
+        <p> exp. listed_info.companyname = "オリンパス" </p>
+        <p> exp. listed_info.companyname like "%オリ%" </p>
+        <br>
+        <p> Filter2/daily:</p>
+        <form action="{{ url_for('analysis.filter2') }}" method="get">
+          <textarea name="filter2" id="filter2" rows="3" style="width: 350px; resize: vertical;" value={{filter2}}></textarea>
+          <button type="submit">Search</button>
+        </form>
+        <br>
+        <form action="{{ url_for('analysis.filter2') }}" method="get">
+          <label for="code">フィルターMIX:</label>
+          <input type="text" name="code" value={{filtermix}} ></input>
+          <button type="submit">Search</button>
+        </form>
+        <br>
+        <p>==============================================</p>
+        <br>
+        </p>
+        <br>
+        <br>
+      </section>
+      <footer>
+        <p>ana_main</p>
+        <p>© 2024 SWFSOMA013 All Rights Reserved.</p>
+        <p>{{ current_time }}</p>
+      </footer>
+    </div>
+    <div class="card-container">
+      <div class="card">
+          {% if db_data == [] %}
+            {% if initial == 1 %}
+              <p>===Sub-Pannel===</p>
+            {% else %}
+              <p>該当するデータが見つかりません。</p>
+              <a href="javascript:history.back()">Previous</a>
+              {% endif %}
+          {% else %}
+          <h3>検索ワード：{{ filters }}</h3>
+            <p>
+              {% set end = page * per_page %}
+              {% if end > total_records %}
+                  {% set end = total_records %}
+              {% endif %}
+              全{{ total_records }}件中 {{ (page - 1) * per_page + 1 }}-{{ end }}件目を表示
+            </p>
+            {% if page > 1 %}
+              <a href="{{ url_for(endpoint, page=page-1, filter2="43800") }}">前のページ</a>
+            {% endif %}
+            {% if page < total_pages %}
+              <a href="{{ url_for(endpoint, page=page+1, filter2="43800") }}">次のページ</a>
+            {% endif %}
+            <table border= "1">
+                  <tr>
+                      <th>銘柄コード</th>
+                      <th>会社名</th>
+                      <th>乖離率/%</th>
+                  </tr>
+                  {% for db in db_data %}
+                      <tr>
+                          <td><a href="{{ url_for('rpt.tstock_query10', code=db.code) }}">{{ db.code }}</a></td>
+                          <td><a href="{{ url_for('rpt.info_card', code=db.code) }}">{{ db.companyname }}</a></td>
+                          <td>{{db.deviation_rate}}</td>
+                        </tr>
+                  {% endfor %}
+              </table>
+          {% endif %}
+      </div>
+  </body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ head_title }} </title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/base3.css') }}">
+    </head>
+    <div class="main-content">
+        <header>
+            <h2>{{header_title }}</h2>
+            {% if page > 1 %}
+                <a href="{{ url_for(endpoint, page=page-1) }}">前のページ</a>
+            {% endif %}
+            {% if page < total_records %}
+                <a href="{{ url_for(endpoint, page=page+1) }}">次のページ</a>
+            {% endif %}
+            <p>
+            {% set end = page * per_page %}
+            {% if end > total_records %}
+                {% set end = page * per_page %}
+            {% endif %}
+            全{{ total_records }}件中 {{ (page - 1) * per_page + 1 }}-{{ end }}件目を表示
+            </p>
+        </header>
+        <body>
+                {% if db_data == [] %}
+                    <p> 該当するデータが見つかりません。 </p>
+                {% else %}
+                    <table border= "1">
+                        <tr>
+                            <th>情報適用年月日</th>
+                            <th>銘柄コード</th>
+                            <th>会社名</th>
+                            <th>会社名英語</th>
+                            <th>17業種コード</th>
+                            <th>17業種コード名</th>
+                            <th>33業種コード</th>
+                            <th>33業種コード名</th>
+                            <th>規模コード</th>
+                            <th>市場区分コード</th>
+                            <th>市場区分名</th>
+                        </tr>
+                        {% for db in db_data %}
+                            <tr>
+                                <td>{{db.date}}</td>
+                                <td>{{db.code}}</td>
+                                <td>{{db.companyname}}</td>
+                                <td>{{db.companynameenglish}}</td>
+                                <td>{{db.sector17code}}</td>
+                                <td>{{db.sector17codename}}</td>
+                                <td>{{db.sector33code}}</td>
+                                <td>{{db.sector33codename}}</td>
+                                <td>{{db.scalecategory}}</td>
+                                <td>{{db.marketcode}}</td>
+                                <td>{{db.marketcodename}}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endif %}
+        </body>
+        <footer>
+            <a href="{{ url_for(return_url) }}"> {{return_name}} </a>
+            <p>© 2024 SWFSOMA013 All Rights Reserved.</p>
+            <p>{{ current_time }}</p>
+        </footer>
+    </div>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reports</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/base3.css') }}"
+    />
+    <style>
+      .card-container {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 20px;
+          justify-content: flex-end;
+      }
+      .card {
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 16px;
+          margin-top: 100px;
+          margin-right: 10px;
+          margin-bottom: 100px;
+          width: 400px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          text-decoration: none;
+          color: inherit;
+          transition: transform 0.2s;
+      }
+      .card h3 {
+          margin-top: 0;
+          font-size: 1.2em;
+      }
+      .card p {
+          margin: 8px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidebar">
+      <ul>
+        <br><br>
+        <li><a href={{ url_for('analysis.analysis_query') }}>分析</a></li>
+        <li><a href="#">主力指標</a></li>
+        <li><a href="#">銘柄一覧</a></li>
+        <li><a href="#">各種レポート</a></li>
+        <br><br><br>
+        <a href="javascript:history.back()">Previous</a>
+        <br><br>
+        <a href="{{ url_for('nkapp.index') }}">Home</a>
+        <br><br><br><br><br><br><br><br><br><br><br><br>
+        <a
+          href="https://jpx-jquants.com/auth/signin"
+          target="_blank"
+          rel="noopener noreferrer"
+          >J-Quontes</a
+        ><br>
+        <br>
+        <a href="https://chatgpt.com/g/g-qSdKOpRki-webahuri-nksys-zuo-cheng"
+        target="_blank" rel="noopener noreferrer"
+          >ChatGPT</a
+        ><br>
+        <br>
+        <a
+          href="https://www.perplexity.ai/"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Perplexity</a
+        ><br>
+      </ul>
+    </div>
+    <div class="main-content">
+      <header>
+        <h1>Analysis</h1>
+      </header>
+      <section>
+        <h2>Database:{{ current_db }}</h2>
+        <h4>Table1: listed_info</h4>
+          <p>
+            DB: Last Updated: {{ last_update_info }} ; {{ record_count_info }}
+            records
+          </p>
+          <br>
+        <h4>Table2: Daily_Quotes_All</h4>
+          <p>
+            DB: Last Updated: {{ last_update_all }} ; {{ record_count_all }}
+            records
+          </p>
+          <br>
+          <h3>クエリービルダー</h3>
+          <form method="POST">
+            <label for="dropdown10">市場区分コード:</label>
+            <select name="dropdown10" id="dropdown10" required>
+              <option value="">選択してください</option>
+              {% for value, text in VALUE_MAP10.items() %}
+                <option value="{{ value }}" {% if value == selected10 %}selected{% endif %}>{{ text }}</option>
+              {% endfor %}
+            </select>
+            <br><br>
+
+            <label for="dropdown20">計算方法:</label>
+            <select name="dropdown20" id="dropdown20" required>
+              <option value="">選択してください</option>
+              {% for value, text in VALUE_MAP20.items() %}
+                <option value="{{ value }}" {% if value == selected20 %}selected{% endif %}>{{ text }}</option>
+              {% endfor %}
+            </select>
+            <label for="param21"> {{paramname21}}:</label>
+            <input type="number" style="width:50px" id="param21"
+            name="param21" value="{{paramquery21}}" min="1" max="400" step="1"></input>
+            <br><br>
+
+            <label for="dropdown30">演算子:</label>
+            <select name="dropdown30" id="dropdown30" required>
+              <option value="">選択してください</option>
+              {% for value, text in VALUE_MAP30.items() %}
+                <option value="{{ value }}" {% if value == selected30 %}selected{% endif %}>{{ text }}</option>
+              {% endfor %}
+            </select>
+            <label for="param32"> {{paramname32}}:</label>
+            <input type="number" style="width:50px" step="0.01" id="param32"
+            name="param32" value="{{paramquery32}}"></input><br>
+            <label for="param31"> {{paramname31}}:</label>
+            <input type="number" style="width:50px" id="param31"
+            name="param31" value="{{paramquery31}}" min="0" max="400" step="1"></input>
+            <br><br>
+
+            <label for="dropdown40">ソート順:</label>
+            <select name="dropdown40" id="dropdown40" required>
+              <option value="">選択してください</option>
+              {% for value, text in VALUE_MAP40.items() %}
+                <option value="{{ value }}" {% if value == selected40 %}selected{% endif %}>{{ text }}</option>
+              {% endfor %}
+            </select>
+            <label for="dropdown41">KEY Column:</label>
+            <select name="dropdown41" id="dropdown41" required>
+              <option value="">選択してください</option>
+              {% for value, text in VALUE_MAP41.items() %}
+                <option value="{{ value }}" {% if value == selected41 %}selected{% endif %}>{{ text }}</option>
+              {% endfor %}
+            </select>
+            <br><br>
+            <input type="submit" value="送信"</input>
+        </form>
+
+        <p>==============================================</p>
+        <br>
+      </section>
+      <footer>
+        <p>ana_query</p>
+        <p>© 2024 SWFSOMA013 All Rights Reserved.</p>
+        <p>{{ current_time }}</p>
+      </footer>
+    </div>
+    <div class="card-container">
+      <div class="card">
+          {% if db_data == [] %}
+            {% if initial == 1 %}
+              <p>===Sub-Pannel===</p>
+            {% else %}
+              <p>該当するデータが見つかりません。</p>
+              <a href="javascript:history.back()">Previous</a>
+              {% endif %}
+          {% else %}
+          <h3>検索ワード：{{ filters }}</h3>
+            <p>
+              {% set end = page * per_page %}
+              {% if end > total_records %}
+                  {% set end = total_records %}
+              {% endif %}
+              全{{ total_records }}件中 {{ (page - 1) * per_page + 1 }}-{{ end }}件目を表示
+            </p>
+            {% if page > 1 %}
+              <a href="{{ url_for(endpoint, page=page-1) }}">前のページ</a>
+            {% endif %}
+            {% if page < total_pages %}
+              <a href="{{ url_for(endpoint, page=page+1) }}">次のページ</a>
+            {% endif %}
+            <table border= "1">
+                  <tr>
+                      <th>銘柄コード</th>
+                      <th>会社名</th>
+                      <th>{{column_name}}</th>
+                  </tr>
+                  {% for db in db_data %}
+                      <tr>
+                          <td><a href="{{ url_for('rpt.tstock_query10', code=db.code) }}">{{ db.code }}</a></td>
+                          <td><a href="{{ url_for('rpt.info_card', code=db.code) }}">{{ db.companyname }}</a></td>
+                          <td>{{db[2] | round(1)}}</td>
+                        </tr>
+                  {% endfor %}
+              </table>
+          {% endif %}
+      </div>
+  </body>
+</html>

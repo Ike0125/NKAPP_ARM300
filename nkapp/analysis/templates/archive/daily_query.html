@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ head_title }} </title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/base3.css') }}">
+    </head>
+    <div class="main-content">
+        <header>
+            <h2>{{header_title }}</h2>
+            {% if page > 1 %}
+                <a href="{{ url_for(endpoint, page=page-1, code=code_query) }}">前のページ</a>
+            {% endif %}
+            {% if page < total_pages %}
+                <a href="{{ url_for(endpoint, page=page+1, code=code_query) }}">次のページ</a>
+            {% endif %}
+            <p>
+            {% set end = page * per_page %}
+            {% if end > total_records %}
+                {% set end = page * per_page %}
+            {% endif %}
+            銘柄コード：{{code_query}}：全{{ total_records }}件中 {{ (page - 1) * per_page + 1 }}-{{ end }}件目を表示
+            </p>
+        </header>
+        <body>
+                {% if db_data == [] %}
+                    <p> 該当するデータが見つかりません。</p><br>
+                    <a href="{{ url_for(return_url) }}"> {{return_name}} </a>
+                {% else %}
+                    <table border= "1">
+                        <tr>
+                            <th>日付</th>
+                            <th>銘柄コード</th>
+                            <th>始値（調整前）</th>
+                            <th>高値（調整前）</th>
+                            <th>安値（調整前）</th>
+                            <th>終値（調整前）</th>
+                            <th>1:ストップ高</th>
+                            <th>1:ストップ安</th>
+                            <th>取引高（調整前）</th>
+                            <th>取引代金</th>
+                            <th>調整係数</th>
+                            <th>調整済み始値</th>
+                            <th>調整済み高値</th>
+                            <th>調整済み安値</th>
+                            <th>調整済み終値</th>
+                            <th>調整済み取引高</th>
+                        </tr>
+                        {% for db in db_data %}
+                            <tr>
+                                <td>{{db.date}}</td>
+                                <td>{{db.code}}</td>
+                                <td>{{db.open}}</td>
+                                <td>{{db.high}}</td>
+                                <td>{{db.low}}</td>
+                                <td>{{db.close}}</td>
+                                <td>{{db.upperlimit}}</td>
+                                <td>{{db.lowerlimit}}</td>
+                                <td>{{db.volume}}</td>
+                                <td>{{db.turnovervalue}}</td>
+                                <td>{{db.adjustmentfactor}}</td>
+                                <td>{{db.adjustmentopen}}</td>
+                                <td>{{db.adjustmenthigh}}</td>
+                                <td>{{db.adjustmentlow}}</td>
+                                <td>{{db.adjustmentclose}}</td>
+                                <td>{{db.adjustmentvolume}}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endif %}
+        </body>
+        <footer>
+            <a href="{{ url_for(return_url) }}"> {{return_name}} </a>
+            <p>© 2024 SWFSOMA013 All Rights Reserved.</p>
+            <p>{{ current_time }}</p>
+        </footer>
+    </div>
+</html>

@@ -1,0 +1,139 @@
+/* リセット */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ヘッダー */
+header {
+  background-color: #203169;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+  display: flex;           /* フレックスボックスで要素を横並びに */
+  justify-content: space-between;  /* 左右に配置 */
+   font-size: 14px;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 60px; /* ヘッダーの高さを指定 */
+  z-index: 10; /* 他の要素の上に表示 */
+}
+header a {
+  color: #fff;
+}
+
+
+/* サイドバー */
+.sidebar {
+  width: 200px;
+  background-color: #808fcf;
+  color: #425c9a;
+  padding: 20px;
+  flex-shrink: 0;
+  height: calc(100vh - 100px); /* ヘッダーとフッターの間の高さに調整 */
+  position: sticky;
+  top: 60px; /* ヘッダーの下に固定 */
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  margin-bottom: 20px;
+}
+
+.sidebar ul li a {
+  color: #000000;
+  text-decoration: none;
+  font-size: 18px;
+  display: block;
+}
+
+.sidebar ul li a:hover {
+  background-color: #203169;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+/* メインコンテンツ */
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+  margin-left: 0px; /* サイドバーの幅に合わせて余白を追加 */
+  margin-top: 60px;
+  margin-bottom: 30px;
+}
+
+/* テーブル行の背景色を設定 */
+.table-header-row {
+  background-color: #7db8f0; /* お好みの背景色 */
+  color: #333; /* 必要に応じてテキストカラーも設定 */
+}
+/* CSSで各カラムのスタイルを個別に設定 */
+.text-right {
+  text-align: right;      /* 右寄せ */
+  padding-right: 0.5em; /* 右側に0.5文字分の余白を追加 */
+}
+.text-left {
+  text-align: left;
+  padding-left: 0.5em;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.highlight {
+  font-weight: bold;
+  color: blue;
+}
+.min-width-col-1 {
+  min-width: 100px; /* 最小幅を90pxに設定 */
+  white-space: nowrap; /* テキストの折り返しを防止（必要に応じて） */
+}
+.min-width-col-2 {
+  min-width: 150px; /* 最小幅を120pxに設定 */
+  white-space: nowrap; /* テキストの折り返しを防止（必要に応じて） */
+}
+.min-width-col-3 {
+  min-width: 60px; /* 最小幅を60pxに設定 */
+  white-space: nowrap; /* テキストの折り返しを防止（必要に応じて） */
+}
+
+/* フッター */
+footer {
+  background-color: #203169;
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+  display: flex;           /* フレックスボックスで要素を横並びに */
+  justify-content: space-between;  /* 左右に配置 */
+  padding: 10px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40px; /* フッターの高さを指定 */
+  z-index: 20;
+}
+
+footer a {
+  color: #fff;
+}
