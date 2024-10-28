@@ -7,11 +7,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>NKsys Dashboard(ARM200)</h1>
+    <h1>NKsys Dashboard(ARM300)</h1>
     <h2>/index</h2>
     <ul>
         <li><a href="{{ url_for('rpt.main') }}">Report</a></li>
         <li><a href="{{ url_for('analysis.main') }}">Analysis</a></li>
+        <li><a href="{{ url_for('analysis.builder') }}">Query Builder</a></li>
     </ul>
 </body>
 </html>

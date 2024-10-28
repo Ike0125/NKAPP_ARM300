@@ -70,7 +70,7 @@ header a {
 
 /* メインコンテンツ */
 .main-content {
-  flex-grow: 1;
+  flex-grow: 0;
   padding: 20px;
   margin-left: 0px; /* サイドバーの幅に合わせて余白を追加 */
   margin-top: 60px;
@@ -141,14 +141,14 @@ footer a {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  justify-content: flex-end;
+  justify-content: flex-start;
+  margin-left: 100px;
 }
 .card {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 16px;
   margin-top: 100px;
-  margin-right: 10px;
   margin-bottom: 100px;
   width: 400px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -162,4 +162,56 @@ footer a {
 }
 .card p {
   margin: 8px 0;
+}
+/*
+.child { display: none; margin-left: 20px; }
+.caret-down .child { display: block; }
+.caret { cursor: pointer; }
+.icon { display: inline-block; width: 16px; height: 16px; text-align: center; }
+*/
+
+ul, #myUL {
+list-style-type: none;
+}
+#myUL {
+margin: 0;
+padding: 0;
+}
+.parent {
+cursor: pointer;
+display: flex;
+align-items: center;
+margin-top: 10px;
+font-weight: bold;
+}
+.arrow {
+margin-right: 8px;
+font-size: 20px;
+}
+.child {
+display: none; /* ページロード時は非表示 */
+margin-left: 50px; /* 親からのインデント */
+}
+.caret::before {
+  content: "▶";   /* マークの指定 */
+  font-size: 15px; /* フォントサイズの調整 */
+  margin-right: 5px; /* 右側の余白 */
+  vertical-align: middle; /* テキストと垂直方向の位置を中央に */
+}
+.caret-down::before {
+  content: "▼"; /* 展開時のマーク */
+}
+table {
+  width: 100%;  /* テーブルの幅を親要素に合わせる */
+  border-collapse: collapse;  /* セルの境界を統合 */
+  margin-top: 5px;  /* 上に少し余白を追加 */
+}
+
+td {
+  padding: 4px;  /* セルの内側に余白を追加 */
+  vertical-align: top;  /* テキストを上に揃える */
+}
+
+td:first-child {
+  width: 30%;  /* ラベル部分の幅を固定 */
 }

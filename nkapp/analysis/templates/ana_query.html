@@ -8,34 +8,6 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='css/base3.css') }}"
     />
-    <style>
-      .card-container {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 20px;
-          justify-content: flex-end;
-      }
-      .card {
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          padding: 16px;
-          margin-top: 100px;
-          margin-right: 10px;
-          margin-bottom: 100px;
-          width: 400px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-          text-decoration: none;
-          color: inherit;
-          transition: transform 0.2s;
-      }
-      .card h3 {
-          margin-top: 0;
-          font-size: 1.2em;
-      }
-      .card p {
-          margin: 8px 0;
-      }
-    </style>
   </head>
   <body>
     <div class="sidebar">
@@ -193,5 +165,6 @@
               </table>
           {% endif %}
       </div>
+    </div>
   </body>
 </html>

@@ -1,6 +1,7 @@
-"""  nkapp.rpt.report.py  """
+"""  nkapp.analysis.analysis10.py  """
 from math import ceil
 from datetime import timedelta, datetime
+import pandas as pd
 from flask import request, session
 from sqlalchemy import func, and_, case, literal
 from sqlalchemy import select, desc, asc
@@ -10,7 +11,7 @@ from .config import VALUE_MAP10, VALUE_MAP20, VALUE_MAP30, VALUE_MAP40, VALUE_MA
 
 
 class Analysisparams10:
-    """Params for listed_info"""
+    """ Params """
 
     def __init__(self):
         # for BBS
@@ -192,14 +193,13 @@ class Analysisparams10:
         )
         end_time = datetime.now()
         query_time = end_time - start_time
-        print(f"Query_time: {query_time}") 
+        print(f"Query_time: {query_time}")
         # print(f"params: {params}")
         return params
 
-
     @staticmethod
     def ana_query_ma(builders):
-        """ querybuilder for moving average"""
+        """querybuilder for moving average"""
         marketcode_query = builders["selected10"]
         operator = builders["selected30"]
         ana_sort = builders["selected40"]
@@ -208,9 +208,7 @@ class Analysisparams10:
         ana_param32 = float(builders["paramquery32"])
         key_column = builders["selected41"]
         with Session() as session:
-            last_update = session.query(
-                func.max(Tl.daily_table.c.date)
-            ).scalar()
+            last_update = session.query(func.max(Tl.daily_table.c.date)).scalar()
             end_day = last_update - timedelta(days=day_gap)
             start_day = end_day - timedelta(days=window * 2)
             # marketcodeの条件を動的に設定
@@ -254,7 +252,9 @@ class Analysisparams10:
                 )
             )
             .where(subquery2.c.date == end_day)
-            .group_by(subquery.c.code, subquery.c.companyname, subquery2.c.deviation_rate)
+            .group_by(
+                subquery.c.code, subquery.c.companyname, subquery2.c.deviation_rate
+            )
             .order_by(
                 Analysisparams10.get_sort_order(
                     ana_sort, getattr(subquery2.c, key_column)
@@ -266,7 +266,7 @@ class Analysisparams10:
 
     @staticmethod
     def ana_query_rsi(builders):
-        """ querybuilder for RSI """
+        """querybuilder for RSI"""
         marketcode_query = builders["selected10"]
         operator = builders["selected30"]
         ana_sort = builders["selected40"]
@@ -274,13 +274,11 @@ class Analysisparams10:
         day_gap = int(builders["paramquery31"])
         ana_param32 = float(builders["paramquery32"])
         # key_column = builders["selected41"]
-        key_column = (f"rsi_{window}")
+        key_column = f"rsi_{window}"
         with Session() as session:
-            last_update = session.query(
-                func.max(Tl.daily_table.c.date)
-            ).scalar()
+            last_update = session.query(func.max(Tl.daily_table.c.date)).scalar()
             end_day = last_update - timedelta(days=day_gap)
-            start_day = end_day - timedelta(days=window + 2)    # RSI用に＋２日分
+            start_day = end_day - timedelta(days=window + 2)  # RSI用に＋２日分
             # marketcodeの条件を動的に設定
             marketcode_condition = case(
                 (literal(marketcode_query) == "0100", True),  # "0100"の場合は常にTrue
@@ -297,7 +295,7 @@ class Analysisparams10:
                 .subquery()
             )
         # print(f"subquery: {subquery}")
-        rsi_query = VT.rsi(window).subquery('rsi_subquery')
+        rsi_query = VT.rsi(window).subquery("rsi_subquery")
 
         # subquery2 = (
         #    select(
@@ -312,11 +310,13 @@ class Analysisparams10:
         # print(f"subquery2: {subquery2}")
 
         base_query = (
-            select(subquery.c.code, subquery.c.companyname, rsi_query.c[f"rsi_{window}"])
+            select(
+                subquery.c.code, subquery.c.companyname, rsi_query.c[f"rsi_{window}"]
+            )
             .join(rsi_query, subquery.c.code == rsi_query.c.code)
             .where(
                 rsi_query.c.date == end_day,
-                rsi_query.c[f"rsi_{window}"].op(operator)(ana_param32)
+                rsi_query.c[f"rsi_{window}"].op(operator)(ana_param32),
             )
             .order_by(
                 Analysisparams10.get_sort_order(
@@ -328,83 +328,85 @@ class Analysisparams10:
         # print(f"RSI:rsi_{window}")
         return base_query
 
-
     @staticmethod
     def ana_query_macd(builders):
         """Optimized and corrected query builder for MACD."""
+        # 初期設定
         marketcode_query = builders["selected10"]
         operator = builders["selected30"]
         ana_sort = builders["selected40"]
-        window = int(builders["paramquery21"])
+        short_window = int(builders["paramquery21"])
+        long_window = int(builders["paramquery22"])
+        signal_window = int(builders["paramquery23"])
         day_gap = int(builders["paramquery31"])
 
         with Session() as session:
-            last_update = session.query(
-                func.max(Tl.daily_table.c.date)
-            ).scalar()
+            # データ取得期間計算
+            last_update = session.query(func.max(Tl.daily_table.c.date)).scalar()
             end_day = last_update - timedelta(days=day_gap)
-            start_day = end_day - timedelta(days=window * 2)  # 必要な期間をカバー
+            start_day = end_day - timedelta(days=long_window * 2)  # 必要な期間をカバー
 
             print(f"End day for analysis: {end_day}")
             print(f"start day: {start_day}")
 
+            # marketcodeの条件設定
             if marketcode_query == "0100":
                 marketcode_condition = True  # 全市場対象
             else:
                 marketcode_condition = Tl.company.marketcode == marketcode_query
 
+            # Tl.companyとTl.dailyを結合し、必要なデータを取得
             base_query = (
                 select(
                     Tl.daily.code,
                     Tl.company.companyname,
                     Tl.daily.date,
-                    Tl.daily.adjustmentclose
+                    Tl.daily.adjustmentclose,
                 )
                 .join(Tl.company, Tl.company.code == Tl.daily.code)
                 .where(
                     marketcode_condition,
                     Tl.daily.date >= start_day,
-                    Tl.daily.date <= end_day
+                    Tl.daily.date <= end_day,
                 )
                 .subquery()
             )
 
             # Fetch data and calculate MACD
             data_df = pd.read_sql(base_query, session.bind)
-            macd_line, signal_line, histogram = calculate_macd(data_df)
-
-            data_df['macd'] = macd_line
-            data_df['signal'] = signal_line
-            data_df['histogram'] = histogram
-
-            final_query = (
-                select(
-                    base_query.c.code,
-                    base_query.c.companyname,
-                    base_query.c.date,
-                    data_df['macd'].label('macd'),
-                    data_df['signal'].label('signal'),
-                    data_df['histogram'].label('histogram')
-                )
-                .subquery()
+            macd_line, signal_line, histogram = VT.calculate_macd(
+                data_df, short_window, long_window, signal_window
             )
 
+            data_df["macd"] = macd_line
+            data_df["signal"] = signal_line
+            data_df["histogram"] = histogram
+
+            # 最終的なクエリ
+            final_query = select(
+                base_query.c.code,
+                base_query.c.companyname,
+                base_query.c.date,
+                data_df["macd"].label("macd"),
+                data_df["signal"].label("signal"),
+                data_df["histogram"].label("histogram"),
+            ).subquery()
+
+            # フィルタリングとソート
             result_query = (
                 select(
                     final_query.c.code,
                     final_query.c.companyname,
                     final_query.c.macd,
                     final_query.c.signal,
-                    final_query.c.histogram
+                    final_query.c.histogram,
                 )
                 .where(final_query.c.date == end_day)
                 .order_by(
-                    Analysisparams10.get_sort_order(ana_sort, final_query.c.macd)
+                    Analysisparams10.get_sort_order(ana_sort, final_query.c.histogram)
                 )
             )
         return result_query
-
-
 
     @staticmethod
     def ana_query_rsi2(builders):
@@ -418,9 +420,7 @@ class Analysisparams10:
         # key_column = f"rsi_{window}"
 
         with Session() as session:
-            last_update = session.query(
-                func.max(Tl.daily_table.c.date)
-            ).scalar()
+            last_update = session.query(func.max(Tl.daily_table.c.date)).scalar()
             end_day = last_update - timedelta(days=day_gap)
             start_day = end_day - timedelta(days=window * 2)  # 必要な期間をカバー
 
@@ -439,32 +439,28 @@ class Analysisparams10:
                     Tl.daily.code,
                     Tl.company.companyname,
                     Tl.daily.date,
-                    Tl.daily.adjustmentclose
+                    Tl.daily.adjustmentclose,
                 )
                 .join(Tl.company, Tl.company.code == Tl.daily.code)
                 .where(
                     marketcode_condition,
                     Tl.daily.date >= start_day,
-                    Tl.daily.date <= end_day
+                    Tl.daily.date <= end_day,
                 )
                 .subquery()
             )
             # print(f"Number of records in base_query: {base_query}")
-            
+
             # **修正ポイント1：lag値を計算するサブクエリを作成**
-            lag_query = (
-                select(
-                    base_query.c.code,
-                    base_query.c.companyname,
-                    base_query.c.date,
-                    base_query.c.adjustmentclose,
-                    func.lag(base_query.c.adjustmentclose).over(
-                        partition_by=base_query.c.code,
-                        order_by=base_query.c.date
-                    ).label('lag_value'),
-                )
-                .subquery()
-            )
+            lag_query = select(
+                base_query.c.code,
+                base_query.c.companyname,
+                base_query.c.date,
+                base_query.c.adjustmentclose,
+                func.lag(base_query.c.adjustmentclose)
+                .over(partition_by=base_query.c.code, order_by=base_query.c.date)
+                .label("lag_value"),
+            ).subquery()
             # print(f"lag_query: {lag_query}")
             # **修正ポイント2：lag_valueがNULLでない行を選択し、price_changeを計算**
             rsi_query = (
@@ -472,7 +468,9 @@ class Analysisparams10:
                     lag_query.c.code,
                     lag_query.c.companyname,
                     lag_query.c.date,
-                    (lag_query.c.adjustmentclose - lag_query.c.lag_value).label('price_change'),
+                    (lag_query.c.adjustmentclose - lag_query.c.lag_value).label(
+                        "price_change"
+                    ),
                 )
                 .where(lag_query.c.lag_value.isnot(None))
                 .subquery()
@@ -482,11 +480,19 @@ class Analysisparams10:
             # pylint: disable=not-callable
             avg_gain = func.avg(
                 case((rsi_query.c.price_change > 0, rsi_query.c.price_change), else_=0)
-            ).over(partition_by=rsi_query.c.code, order_by=rsi_query.c.date, rows=(-(window-1), 0))
+            ).over(
+                partition_by=rsi_query.c.code,
+                order_by=rsi_query.c.date,
+                rows=(-(window - 1), 0),
+            )
 
             avg_loss = func.avg(
                 case((rsi_query.c.price_change < 0, -rsi_query.c.price_change), else_=0)
-            ).over(partition_by=rsi_query.c.code, order_by=rsi_query.c.date, rows=(-(window-1), 0))
+            ).over(
+                partition_by=rsi_query.c.code,
+                order_by=rsi_query.c.date,
+                rows=(-(window - 1), 0),
+            )
 
             # RSIの計算（ゼロ除算を防ぐための条件分岐を追加）
             # pylint: disable=not-callable
@@ -495,50 +501,50 @@ class Analysisparams10:
             #    (avg_loss == 0, 100),
             #    (avg_gain == 0, 0),
             #    else_=100 - (100 / (1 + rs))
-            #).label('rsi_value')
+            # ).label('rsi_value')
             # rsi_final = func.coalesce(rsi_value, 50).label('rsi_final')
             # print(f"rsi_final_data: {rsi_final}")
-            rs = case(
-                (avg_loss != 0, avg_gain / avg_loss),
-                else_=0
-            ).label('rs')
+            rs = case((avg_loss != 0, avg_gain / avg_loss), else_=0).label("rs")
 
-            rsi_final = (100 - (100 / (1 + rs)))
-
+            rsi_final = 100 - (100 / (1 + rs))
 
             # 最終的なクエリ
-            final_query = (
-                select(
-                    rsi_query.c.code,
-                    rsi_query.c.companyname,
-                    rsi_query.c.date,
-                    rsi_final.label('rsi_final')
-                )
-                .subquery()
-            )
+            final_query = select(
+                rsi_query.c.code,
+                rsi_query.c.companyname,
+                rsi_query.c.date,
+                rsi_final.label("rsi_final"),
+            ).subquery()
             # print(f"final_query: {final_query}")
             # フィルタリングとソート
             result_query = (
                 select(
                     final_query.c.code,
                     final_query.c.companyname,
-                    final_query.c.rsi_final
+                    final_query.c.rsi_final,
                 )
                 .where(final_query.c.date == end_day)
-                .where(
-                    final_query.c.rsi_final.op(operator)(ana_param32)
-                )
+                .where(final_query.c.rsi_final.op(operator)(ana_param32))
                 .order_by(
-                    Analysisparams10.get_sort_order(
-                        ana_sort, final_query.c.rsi_final)
-                    )
+                    Analysisparams10.get_sort_order(ana_sort, final_query.c.rsi_final)
+                )
             )
             # print(f"result_query: {result_query}")
-            print(f"Base query count: {session.execute(select(func.count()).select_from(base_query)).scalar()}")
-            print(f"Lag query count: {session.execute(select(func.count()).select_from(lag_query)).scalar()}")
-            print(f"RSI query count: {session.execute(select(func.count()).select_from(rsi_query)).scalar()}")
-            print(f"Final query count: {session.execute(select(func.count()).select_from(final_query)).scalar()}")
-            print(f"Result query count: {session.execute(select(func.count()).select_from(result_query)).scalar()}")
+            print(
+                f"Base query count: {session.execute(select(func.count()).select_from(base_query)).scalar()}"
+            )
+            print(
+                f"Lag query count: {session.execute(select(func.count()).select_from(lag_query)).scalar()}"
+            )
+            print(
+                f"RSI query count: {session.execute(select(func.count()).select_from(rsi_query)).scalar()}"
+            )
+            print(
+                f"Final query count: {session.execute(select(func.count()).select_from(final_query)).scalar()}"
+            )
+            print(
+                f"Result query count: {session.execute(select(func.count()).select_from(result_query)).scalar()}"
+            )
             # pylint: disable=not-callable
             """
             debug_query = (
@@ -678,7 +684,6 @@ class Analysisparams10:
             """
         return result_query
 
-
     @staticmethod
     def get_sort_order(sort_value, column):
         """ana_sortの値に基づいてソート順を決定する関数"""
@@ -689,4 +694,3 @@ class Analysisparams10:
         else:
             # デフォルトの挙動（例：昇順）または例外を投げる
             return asc(column)
-

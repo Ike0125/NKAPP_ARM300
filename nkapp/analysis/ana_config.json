@@ -1,0 +1,11 @@
+{
+    "ma_value01": 5,
+    "ma_value02": 22,
+    "ma_value03": 50,
+    "ma_value04": 100,
+    "ma_value05": 200,
+    "rsi_period_value": 11,
+    "macd_short_value": 6,
+    "macd_long_value": 12,
+    "macd_signal_value": 9
+}
