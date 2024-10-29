@@ -1,19 +1,36 @@
 """  nkapp.analysis.analysis20.py  """
 import json
 import os
-# from math import ceil
-# from datetime import timedelta, datetime
-# import pandas as pd
-from flask import request, redirect, url_for, session
-# from sqlalchemy import func, and_, case, literal
-# from sqlalchemy import select, desc, asc
-# from nkapp.models import Session, Tl
-# from nkapp.rpt.models import VT
-# from .config import VALUE_MAP10, VALUE_MAP20, VALUE_MAP30, VALUE_MAP40, VALUE_MAP41
+from flask import request, redirect, url_for
+from nkapp.config import Config
+from .config import VALUE_MAP10
 
 
 class Ana:
     """Params for save/load """
+    @staticmethod
+    def builder():
+        """initial params for "ana_builder.html"""
+        ana_config = Ana.load_config("ana_config.json")
+        # print(type(ana_config))  # <class 'dict'>であることを確認
+        # print(ana_config)  # 内容を確認
+        config_builder = {
+            "current_time" : Config.get_current_time(),
+            "VALUE_MAP10": VALUE_MAP10,
+            "selected10": ana_config.get('selected10', None),
+            "ma_value01": ana_config.get('ma_value01', None),
+            "ma_value02": ana_config.get('ma_value02', None),
+            "ma_value03": ana_config.get('ma_value03', None),
+            "ma_value04": ana_config.get('ma_value04', None),
+            "ma_value05": ana_config.get('ma_value05', None),
+            "rsi_period_value": ana_config.get('rsi_period_value', None),
+            "macd_short_value": ana_config.get('macd_short_value', None),
+            "macd_long_value": ana_config.get('macd_long_value', None),
+            "macd_signal_value": ana_config.get('macd_signal_value', None),
+        }
+        return config_builder
+
+
     @staticmethod
     def load_config(file_name):
         """指定されたJSONファイルから設定を読み込み"""
@@ -30,8 +47,8 @@ class Ana:
         file_path = os.path.join(os.path.dirname(__file__), file_name)
         try:
             with open(file_path, "w", encoding="utf-8") as file:
-                json.dump(config_data, file, indent=4)
-                print(f"{file_path} にデータが保存されました。")
+                json.dump(config_data, file, ensure_ascii=True, indent=4)
+                # print(f"{file_path} にデータが保存されました。")
         except Exception as e:
             print(f"JSONファイルの保存中にエラーが発生しました: {e}")
 
@@ -55,7 +72,7 @@ class Formulaparams:
 
     @staticmethod
     def config():
-        """Config Params"""
+        """Initial Params"""
         return{
             "ma_value01" : 5,
             "ma_value02" : 20,
@@ -80,36 +97,34 @@ class Formulaparams:
                 "ma_value04": int(request.form.get("ma_value04", 100)),
                 "ma_value05": int(request.form.get("ma_value05", 200)),
             }
-            print(f"config_ma: {config_ma}")
+            # print(f"config_ma: {config_ma}")
             config_formula = Ana.load_config("ana_config.json")
             config_formula.update(config_ma)
             Ana.save_config("ana_config.json",config_formula)
-            return config_formula
         else:
             print("ma_Postではありません")
-        return
+        return redirect(url_for('analysis.builder'))
 
 
     @staticmethod
     def register_rsi():
-        """Registration ma_config_params"""
+        """Registration rsi_config_params"""
         if request.method == "POST":
             config_rsi = {
                 "rsi_period_value": int(request.form.get("rsi_period_value","14")),
             }
-            print(f"config_rsi: {config_rsi}")
+            # print(f"config_rsi: {config_rsi}")
             config_formula = Ana.load_config("ana_config.json")
             config_formula.update(config_rsi)
             Ana.save_config("ana_config.json",config_formula)
-            return config_formula
         else:
             print("Post_RSIではありません")
-        return
+        return redirect(url_for('analysis.builder'))
 
 
     @staticmethod
     def register_macd():
-        """Registration ma_config_params"""
+        """Registration macd_config_params"""
         if request.method == "POST":
             # 既存の設定を読み込み
             config_macd = {
@@ -117,11 +132,30 @@ class Formulaparams:
                 "macd_long_value"     : int(request.form.get("macd_long_value", 14)),
                 "macd_signal_value"   : int(request.form.get("macd_signal_value", 9))
             }
-            print(f"config_macd: {config_macd}")
-            Ana.save_config("config_macd.json",config_macd)
+            # print(f"config_macd: {config_macd}")
             config_formula = Ana.load_config("ana_config.json")
             config_formula.update(config_macd)
             Ana.save_config("ana_config.json",config_formula)
+        else:
+            print("Post_MACDではありません")
+        return redirect(url_for('analysis.builder'))
 
-            return config_formula
-        return
+
+class Marketparams:
+    """ Market Params """
+    @staticmethod
+    def reg_marketcode():
+        """Registration ma_config_params"""
+        if request.method == "POST":
+            marketcode = request.form.get("dropdown10","")
+            config_marketcode = {
+                "selected10": VALUE_MAP10.get(marketcode,""),
+                "marketcode": marketcode
+            }
+            # print(f"config_marketcode: {config_marketcode}")
+            config_market = Ana.load_config("ana_config.json")
+            config_market.update(config_marketcode)
+            Ana.save_config("ana_config.json",config_market)
+        else:
+            print("Post_Marketcodeではありません")
+        return redirect(url_for('analysis.builder'))

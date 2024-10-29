@@ -45,8 +45,25 @@
         <h1>Analysis</h1>
       </header>
       <body>
-        <h2>Calculation Formula Setting</h2>
+        <h2>Market Params Setting</h2>
         <p>Click on the arrow(s) to open or close the tree branches.</p>
+        <br>
+        <form action="/nkapp/analysis/reg_marketcode" method="POST">
+          <div class="parent caret" onclick="toggleVisibility(this)">
+            市場区分コード
+          </div>
+          <div class="child">
+            <select name="dropdown10" id="dropdown10" required>
+              <option value="">選択してください</option>
+              {% for value, text in VALUE_MAP10.items() %}
+                <option value="{{ value }}" {% if value == selected10 %}selected{% endif %}>{{ text }}</option>
+              {% endfor %}
+            </select>
+            <input type="submit" value="登録">
+          </div>
+          <br>
+        </form>
+        <h2>Calculation Formula Setting</h2>
         <br>
         <form action="/nkapp/analysis/register_ma" method="POST">
           <div class="parent caret" onclick="toggleVisibility(this)">
@@ -123,6 +140,15 @@
     </div>
     <div class="card-container">
       <div class="card">
+        <h2>Market Params</h2>
+          <table style="width: 350px;">
+            <tr>
+              <td>市場区分：</td>
+              <td>{{selected10}}</td>
+            </tr>
+            <tr>
+          </table>
+          <br>
         <h2>Formula Params</h2>
           <br>
           <h3>移動平均</h3>

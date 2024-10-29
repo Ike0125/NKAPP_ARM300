@@ -1,9 +1,10 @@
 """ rpt/route.py """
-from flask import render_template, Blueprint
+from flask import Blueprint
+from flask import render_template
 from nkapp.config import Mainparams
 from .analysis import Analysisparams
 from .analysis10 import Analysisparams10
-from .analysis20 import Formulaparams, Ana
+from .analysis20 import Marketparams, Formulaparams, Ana
 
 #  Blueprintのインスタンス作成
 bp_analysis = Blueprint("analysis", __name__, template_folder="templates")
@@ -54,34 +55,38 @@ def analysis_query():
     main_params = Mainparams.get_main_params()
     builder_params = Analysisparams10.querybuilder()
     main_params2 = Analysisparams10.analysis_query(builder_params)
-    # print(f"main_params2: {main_params2}")
     return render_template("ana_query.html", **main_params, **main_params2, **builder_params)
 
 
 @bp_analysis.route("/builder", methods=['Get']) # Formula Setting
 def builder():
     """  Routing for Treeview BBS  """
-    formula_params = Ana.load_config("ana_config.json")
-    return render_template('ana_builder.html', **formula_params)
+    config_builder = Ana.builder()
+    return render_template('ana_builder.html', **config_builder)
 
 
 @bp_analysis.route("/register_ma", methods=['Post'])
 def register_ma():
     """  Routing for Treeview BBS  """
-    formula_params = Formulaparams.register_ma()
-    return render_template('ana_builder.html', **formula_params)
+    return Formulaparams.register_ma()
+
 
 
 @bp_analysis.route("/register_rsi", methods=['Post'])
 def register_rsi():
     """  Routing for Treeview BBS  """
-    formula_params = Formulaparams.register_rsi()
-    return render_template('ana_builder.html', **formula_params)
-    # return render_template('ana_builder.html')
+    return Formulaparams.register_rsi()
+
 
 
 @bp_analysis.route("/register_macd", methods=['Post'])
 def register_macd():
     """  Routing for Treeview BBS  """
-    formula_params = Formulaparams.register_macd()
-    return render_template('ana_builder.html', **formula_params)
+    return Formulaparams.register_macd()
+
+
+@bp_analysis.route("/reg_marketcode", methods=['Post'])
+def reg_marketcode():
+    """  Routing for Treeview BBS  """
+    return Marketparams.reg_marketcode()
+

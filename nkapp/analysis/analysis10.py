@@ -123,7 +123,7 @@ class Analysisparams10:
             "paramquery31": paramquery31,  # 何日前params
             "paramquery32": paramquery32,  # 計算params
         }
-        # print(f"builder_params: {builder_params}")
+        print(f"builder_params: {builder_params}")
         # return builder_params
         return builder_params
 
