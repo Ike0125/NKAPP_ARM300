@@ -14,30 +14,35 @@
     <div class="sidebar">
       <ul>
         <br><br>
-        <li><a href={{ url_for('analysis.analysis_query') }}>Analysis</a></li>
-        <li><a href="{{ url_for('analysis.main') }}">Analysis Main</a></li>
-        <li><a href="{{ url_for('rpt.main') }}">Reports</a></li>
-        <li><a href="https://jpx-jquants.com/auth/signin">APIs</a></li>
-        <li><a href={{ url_for('analysis.builder') }}>Parameters</a></li>
-        <li><a href="http://localhost:8888/lab">Jupyter Lab</a></li>
+        <li><a href={{ url_for('analysis.analysis_query31') }}
+          target="_blank" rel="noopener noreferrer"
+          >Analysis31</a></li>
+        <li><a href={{ url_for('rpt.main') }}
+          target="_blank" rel="noopener noreferrer"
+          >Reports</a></li>
+        <li><a href="https://jpx-jquants.com/auth/signin"
+          target="_blank" rel="noopener noreferrer"
+          >APIs</a></li>
+        <li><a href={{ url_for('analysis.builder') }}
+          target="_blank" rel="noopener noreferrer"
+          >Parameters</a></li>
+        <li><a href="http://localhost:8888/lab"
+          target="_blank" rel="noopener noreferrer"
+          >Jupyter Lab</a></li>
         <br><br><br>
-        <a href={{ url_for('analysis.builder') }}>Hot</a>
+        <a href="{{ url_for(return_url) }}"> {{return_name}} </a>
         <br><br>
-        <a href="{{ url_for('nkapp.index') }}">Home</a>
-        <br><br><br><br><br><br><br><br><br><br><br><br>
-        <a href="https://jpx-jquants.com/auth/signin"
-          target="_blank"
-          rel="noopener noreferrer"
-          >J-Quontes</a><br>
+        <a href="{{ url_for(home_url) }}"> Home </a>
+        <br><br>
+        <h5>{{ current_db }}</h5><br>
+        <h4>Table1: listed_info</h4>
+          <p>Last Updated:</p>
+          <p>{{ last_update_info }} ; {{ record_count_info }}records</p>
         <br>
-        <a href="https://chatgpt.com/g/g-qSdKOpRki-webahuri-nksys-zuo-cheng"
-        target="_blank" rel="noopener noreferrer"
-          >ChatGPT</a><br>
-        <br>
-        <a href="https://www.perplexity.ai/"
-          target="_blank"
-          rel="noopener noreferrer"
-          >Perplexity</a><br>
+        <h4>Table2: Daily_Quotes_All</h4>
+        <p>Last Updated:</p><br>
+        <p>{{ last_update_all }} ; {{ record_count_all }}records</p>
+        <br><br><br><br><br><br><br><br>
       </ul>
     </div>
     <div class="main-content">
@@ -50,19 +55,114 @@
         <br>
         <form action="/nkapp/analysis/reg_marketcode" method="POST">
           <div class="parent caret" onclick="toggleVisibility(this)">
-            市場区分コード
+            Marketing Setting
           </div>
           <div class="child">
-            <select name="dropdown10" id="dropdown10" required>
-              <option value="">選択してください</option>
-              {% for value, text in VALUE_MAP10.items() %}
-                <option value="{{ value }}" {% if value == selected10 %}selected{% endif %}>{{ text }}</option>
-              {% endfor %}
-            </select>
+            <tr>
+              <td>
+                <input type="checkbox" id="ckbox19" name="ckbox" value="ckbox19"
+                {% if ckbox19 %}checked{% endif %} onclick="toggleCheckbox(this)">
+                <label for="ckbox19">All:</label>
+              </td><br>
+              <td>
+                <input type="checkbox" id="ckbox10" name="ckbox" value="ckbox10"
+                {% if ckbox10 %}checked{% endif %} onclick="toggleCheckbox(this)">
+                <label for="ckbox10">Market Code:</label>
+              </td>
+              <td>
+                <select name="dropdown10" id="dropdown10" >
+                  <option value="">選択してください</option>
+                  {% for value, text in VALUE_MAP10.items() %}
+                    <option value="{{ value }}" {% if value == marketcode %}selected{% endif %}>{{ text }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+            </tr><br>
+            <tr>
+              <td>
+                <input type="checkbox" id="ckbox11" name="ckbox" value="ckbox11"
+                {% if ckbox11 %}checked{% endif %} onclick="toggleCheckbox(this)">
+                <label for="ckbox11">Sector17Code:</label>
+              </td>
+              <td>
+                <select name="dropdown11" id="dropdown11" >
+                  <option value="">選択してください</option>
+                  {% for value, text in VALUE_MAP11.items() %}
+                    <option value="{{ value }}" {% if value == sector17code %}selected{% endif %}>{{ text }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+            </tr><br>
+            <tr>
+              <td>
+                <input type="checkbox" id="ckbox12" name="ckbox" value="ckbox12"
+                {% if ckbox12 %}checked{% endif %} onclick="toggleCheckbox(this)">
+                <label for="value13">Sector33Code:</label>
+              </td>
+              <td>
+                <select name="dropdown12" id="dropdown12" >
+                  <option value="">選択してください</option>
+                  {% for value, text in VALUE_MAP12.items() %}
+                    <option value="{{ value }}" {% if value == sector33code %}selected{% endif %}>{{ text }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+            </tr><br>
+            <tr>
+              <td>
+                <input type="checkbox" id="ckbox13" name="ckbox" value="ckbox13"
+                {% if ckbox13 %}checked{% endif %} onclick="toggleCheckbox(this)">
+                <label for="ckbox13">Scale Category:</label>
+              </td>
+              <td>
+                <select name="dropdown13" id="dropdown13" >
+                  <option value="">選択してください</option>
+                  {% for value, text in VALUE_MAP13.items() %}
+                    <option value="{{ value }}" {% if value == scalecategory %}selected{% endif %}>{{ text }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+            </tr><br>
+            <tr>
+              <td>
+                <input type="checkbox" id="ckbox14" name="ckbox" value="ckbox14"
+                {% if ckbox14 %}checked{% endif %} onclick="toggleCheckbox(this)">
+                <label for="ckbox14">Custom Category:</label>
+              </td>
+              <td>
+                <select name="dropdown14" id="dropdown14" >
+                  <option value="">選択してください</option>
+                  {% for value, text in VALUE_MAP14.items() %}
+                    <option value="{{ value }}" {% if value == customcategory %}selected{% endif %}>{{ text }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+            </tr>
+            <script>
+              function toggleCheckbox(checkbox) {const checkboxes = document.querySelectorAll('input[name="ckbox"]');
+              checkboxes.forEach(cb => {if (cb !== checkbox) { cb.checked = false; } }); }
+            </script>
+
+            <br>
             <input type="submit" value="登録">
+            <br><br>
+            <p>marketcategory : {{marketcategory}}</p>
+            <p>categorydetail : {{categorydetail}}</p>
+            <p>marketcode     : {{marketcode}}</p>
+            <p>sector17code   : {{sector17code}}</p>
+            <p>sector33code   : {{sector33code}}</p>
+            <p>scalecategory  : {{scalecategory}}</p>
+            <p>customcategory : {{customcategory}}</p>
+            <p>ckbox19:{{ckbox19}}</p>
+            <p>ckbox10:{{ckbox10}}</p>
+            <p>ckbox11:{{ckbox11}}</p>
+            <p>ckbox12:{{ckbox12}}</p>
+            <p>ckbox13:{{ckbox13}}</p>
+            <p>ckbox14:{{ckbox14}}</p>
           </div>
           <br>
         </form>
+
         <h2>Calculation Formula Setting</h2>
         <br>
         <form action="/nkapp/analysis/register_ma" method="POST">
@@ -143,10 +243,13 @@
         <h2>Market Params</h2>
           <table style="width: 350px;">
             <tr>
-              <td>市場区分：</td>
-              <td>{{selected10}}</td>
+              <td>Market:</td>
+              <td>{{marketcategory}}</td>
             </tr>
             <tr>
+              <td>Selected:</td>
+              <td>{{categorydetail}}</td>
+            </tr>
           </table>
           <br>
         <h2>Formula Params</h2>

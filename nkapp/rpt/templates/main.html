@@ -41,14 +41,25 @@
     <div class="sidebar">
       <ul>
         <br><br>
-        <li><a href="#">検索</a></li>
-        <li><a href="#">主力指標</a></li>
-        <li><a href="#">銘柄一覧</a></li>
-        <li><a href="#">各種レポート</a></li>
+        <li><a href={{ url_for('analysis.analysis_query31') }}
+          target="_blank" rel="noopener noreferrer"
+          >Analysis31</a></li>
+        <li><a href={{ url_for('rpt.main') }}
+          target="_blank" rel="noopener noreferrer"
+          >Reports</a></li>
+        <li><a href="https://jpx-jquants.com/auth/signin"
+          target="_blank" rel="noopener noreferrer"
+          >APIs</a></li>
+        <li><a href={{ url_for('analysis.builder') }}
+          target="_blank" rel="noopener noreferrer"
+          >Parameters</a></li>
+        <li><a href="http://localhost:8888/lab"
+          target="_blank" rel="noopener noreferrer"
+          >Jupyter Lab</a></li>
         <br><br><br>
-        <a href="javascript:history.back()">Previous</a>
+        <a href="{{ url_for(return_url) }}"> {{return_name}} </a>
         <br><br>
-        <a href="{{ url_for('nkapp.index') }}">Home</a>
+        <a href="{{ url_for(home_url) }}"> Home </a>
         <br><br><br><br><br><br><br><br><br><br><br><br>
         <a
           href="https://jpx-jquants.com/auth/signin"

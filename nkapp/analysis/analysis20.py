@@ -2,8 +2,8 @@
 import json
 import os
 from flask import request, redirect, url_for
-from nkapp.config import Config
-from .config import VALUE_MAP10
+# from nkapp.config import Config
+from .config import VALUE_MAP10, VALUE_MAP11, VALUE_MAP12, VALUE_MAP13, VALUE_MAP14
 
 
 class Ana:
@@ -12,12 +12,35 @@ class Ana:
     def builder():
         """initial params for "ana_builder.html"""
         ana_config = Ana.load_config("ana_config.json")
-        # print(type(ana_config))  # <class 'dict'>であることを確認
-        # print(ana_config)  # 内容を確認
         config_builder = {
-            "current_time" : Config.get_current_time(),
+            # "current_time" : Config.get_current_time(),
+            "endpoint": "analysis.analysis_query31",
+            "return_url": "analysis.analysis_query31",
+            "return_name": "To analysis31",
+            "home_url": "nkapp.index",
             "VALUE_MAP10": VALUE_MAP10,
+            "VALUE_MAP11": VALUE_MAP11,
+            "VALUE_MAP12": VALUE_MAP12,
+            "VALUE_MAP13": VALUE_MAP13,
+            "VALUE_MAP14": VALUE_MAP14,
+            "marketcategory" : ana_config.get('marketcategory', None),
+            "categorydetail" : ana_config.get('categorydetail', None),
+            "marketcode"     : ana_config.get('marketcode', None),
+            "sector17code"   : ana_config.get('sector17code', None),
+            "sector33code"   : ana_config.get('sector33code', None),
+            "scalecategory"  : ana_config.get('scalecategory', None),
+            "customcategory" : ana_config.get('customcategory', None),
             "selected10": ana_config.get('selected10', None),
+            "selected11": ana_config.get('selected11', None),
+            "selected12": ana_config.get('selected12', None),
+            "selected13": ana_config.get('selected13', None),
+            "selected14": ana_config.get('selected14', None),
+            "ckbox10": ana_config.get('ckbox10_selected', None),
+            "ckbox11": ana_config.get('ckbox11_selected', None),
+            "ckbox12": ana_config.get('ckbox12_selected', None),
+            "ckbox13": ana_config.get('ckbox13_selected', None),
+            "ckbox14": ana_config.get('ckbox14_selected', None),
+            "ckbox19": ana_config.get('ckbox19_selected', None),
             "ma_value01": ana_config.get('ma_value01', None),
             "ma_value02": ana_config.get('ma_value02', None),
             "ma_value03": ana_config.get('ma_value03', None),
@@ -41,14 +64,35 @@ class Ana:
         else:
             return {}  # ファイルが存在しない場合、空の辞書を返す
 
+
     @staticmethod
     def save_config(file_name, config_data):
-        """指定されたJSONファイルに設定を保存"""
-        file_path = os.path.join(os.path.dirname(__file__), file_name)
+        """指定されたJSONファイルに設定を保存
+        Args:
+            file_name (str): 保存するファイル名
+            config_data (dict): 保存する設定データ
+        """
+        # 保存ディレクトリを現在のファイルと同じディレクトリに設定
+        save_dir = os.path.dirname(__file__)
+        # 拡張子が .json でない場合、自動的に追加
+        if not file_name.endswith(".json"):
+            file_name += ".json"
+        # ファイルパスを作成
+        file_path = os.path.join(save_dir, file_name)
+        # バックアップファイル名を生成
+        backup_file_name = file_name.replace(".json", "_backup.json")
+        backup_file_path = os.path.join(save_dir, backup_file_name)
         try:
+            # JSONファイルにデータを保存
             with open(file_path, "w", encoding="utf-8") as file:
                 json.dump(config_data, file, ensure_ascii=True, indent=4)
-                # print(f"{file_path} にデータが保存されました。")
+
+            # バックアップファイルを作成
+            with open(backup_file_path, "w", encoding="utf-8") as backup_file:
+                json.dump(config_data, backup_file, ensure_ascii=True, indent=4)
+
+            print(f"Saved setting file: {file_path}")
+            print(f"Saved backup file: {backup_file_path}")
         except Exception as e:
             print(f"JSONファイルの保存中にエラーが発生しました: {e}")
 
@@ -146,13 +190,73 @@ class Marketparams:
     @staticmethod
     def reg_marketcode():
         """Registration ma_config_params"""
+        marketcategory = ""
+        categorydetail = ""
         if request.method == "POST":
             marketcode = request.form.get("dropdown10","")
+            sector17code = request.form.get("dropdown11","")
+            sector33code = request.form.get("dropdown12","")
+            scalecategory = request.form.get("dropdown13","")
+            customcategory = request.form.get("dropdown14","")
+            ckbox10_selected = 'ckbox10' in request.form.getlist('ckbox')
+            ckbox11_selected = 'ckbox11' in request.form.getlist('ckbox')
+            ckbox12_selected = 'ckbox12' in request.form.getlist('ckbox')
+            ckbox13_selected = 'ckbox13' in request.form.getlist('ckbox')
+            ckbox14_selected = 'ckbox14' in request.form.getlist('ckbox')
+            ckbox19_selected = 'ckbox19' in request.form.getlist('ckbox')
+            selected10 = VALUE_MAP10.get(marketcode,"")
+            selected11 = VALUE_MAP11.get(sector17code,"")
+            selected12 = VALUE_MAP12.get(sector33code,"")
+            selected13 = VALUE_MAP13.get(scalecategory,"")
+            selected14 = VALUE_MAP14.get(customcategory,"")
+            # selected10 = selected10[1]
+            # selected11 = selected11[1]
+            # selected12 = selected12[1]
+            # selected13 = selected13[1]
+            # selected14 = selected14[1]
+
+            if ckbox10_selected is True :
+                marketcategory = "Market Code"
+                categorydetail = selected10
+            elif ckbox11_selected is True :
+                marketcategory = "Sector17Code"
+                categorydetail = selected11
+            elif ckbox12_selected is True :
+                marketcategory = "Sector33Code"
+                categorydetail = selected12
+            elif ckbox13_selected is True :
+                marketcategory = "Scale Category"
+                categorydetail = selected13
+            elif ckbox14_selected is True :
+                marketcategory = "Custom Category"
+                categorydetail = selected14
+            elif ckbox19_selected is True :
+                marketcategory = "All"
+                categorydetail = "---------"
+            else:
+                marketcategory = "---------"
+                categorydetail = "---------"
             config_marketcode = {
-                "selected10": VALUE_MAP10.get(marketcode,""),
-                "marketcode": marketcode
+                "marketcategory" : marketcategory,
+                "categorydetail" : categorydetail,
+                "selected10": selected10,
+                "selected11": selected11,
+                "selected12": selected12,
+                "selected13": selected13,
+                "selected14": selected14,
+                "marketcode"    : marketcode,
+                "sector17code"  : sector17code,
+                "sector33code"  : sector33code,
+                "scalecategory" : scalecategory,
+                "customcategory": customcategory,
+                "ckbox10_selected": ckbox10_selected,
+                "ckbox11_selected": ckbox11_selected,
+                "ckbox12_selected": ckbox12_selected,
+                "ckbox13_selected": ckbox13_selected,
+                "ckbox14_selected": ckbox14_selected,
+                "ckbox19_selected": ckbox19_selected,
             }
-            # print(f"config_marketcode: {config_marketcode}")
+            print(f"config_marketcode: {config_marketcode}")
             config_market = Ana.load_config("ana_config.json")
             config_market.update(config_marketcode)
             Ana.save_config("ana_config.json",config_market)

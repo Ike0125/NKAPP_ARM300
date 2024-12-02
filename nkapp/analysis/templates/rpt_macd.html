@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base3.css') }}">
+    <style>
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: flex-end;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            width: 500px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card h3 {
+            margin-top: 0;
+            font-size: 1.2em;
+        }
+        .card p {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <header>
+            <h2>Report MACD_GC</h2>
+        </header>
+            <div class="card-container">
+                <div class="card">
+                    {% if db_data == [] %}
+                        <p>該当するデータが見つかりません。</p>
+                        <a href="javascript:history.back()">Previous</a>
+                    {% else %}
+                        <table border= "1">
+                            <tr>
+                                <th>銘柄コード</th>
+                                <th>会社名</th>
+                                <th>data A</th>
+                            </tr>
+                            {% for db in db_data %}
+                                <tr>
+                                    <td><a href="{{ url_for('rpt.tstock_query10', code=db.code) }}">{{ db.code }}</a></td>
+                                    <td><a href="{{ url_for('rpt.info_card', code=db.code) }}">{{ db.companyname }}</a></td>
+                                    <td>{{db[2] }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+        <footer>
+            <a href="javascript:history.back()">Previous</a>
+            <p>© 2024 SWFSOMA013 All Rights Reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>条件による表示切替</title>
+  <style>
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<h2>入力項目</h2>
+  <form action="/nkapp/analysis/test_select" method="POST">
+
+    <label for="condition">条件を選択:</label>
+    <select id="condition" name="condition" onchange="toggleInputs()">
+      <option value="0501"{% if condition =="0501"%}selected{% endif %}>0501</option>
+      <option value="0502"{% if condition =="0502"%}selected{% endif %}>0502</option>
+      <option value="0503"{% if condition =="0503"%}selected{% endif %}>0503</option>
+      <option value="0504"{% if condition =="0504"%}selected{% endif %}>0504</option>
+    </select>
+
+    <div id="input1">
+      <label for="dropdown201">移動平均:</label>
+      <select name="dropdown201" id="dropdown201" required>
+          <option value="{{window_201}}">選択してください</option>
+          <option value="{{ma_value01}}" {% if dropdown201 == value %}selected{% endif %}>MA1:{{ma_value01}}days</option>
+          <option value="{{ma_value02}}" {% if ma_value02 == window_201 %}selected{% endif %}>MA2:{{ma_value02}}days</option>
+          <option value="{{ma_value03}}" {% if ma_value03 == window_201 %}selected{% endif %}>MA3:{{ma_value03}}days</option>
+          <option value="{{ma_value04}}" {% if ma_value04 == window_201 %}selected{% endif %}>MA4:{{ma_value04}}days</option>
+          <option value="{{ma_value05}}" {% if ma_value05 == window_201 %}selected{% endif %}>MA5:{{ma_value05}}days</option>
+      </select>
+
+    </div>
+
+    <div id="input2">
+      <label>チェックボックス2:</label>
+      <input type="checkbox" id="value02" name="value" value="value02" {% if value02 %}checked{% endif %} onclick="toggleCheckbox(this)">
+      <br>
+      <label>チェックボックス2a:</label>
+      <input type="checkbox" id="value02a" name="value" value="value02a" {% if value02a %}checked{% endif %} onclick="toggleCheckbox(this)">
+      <br>
+      <label>チェックボックス2b:</label>
+      <input type="checkbox" id="value02b" name="value" value="value02b" {% if value02b %}checked{% endif %} onclick="toggleCheckbox(this)">
+    </div>
+    <script> function toggleCheckbox(checkbox) { const checkboxes = document.querySelectorAll('input[name="value"]'); checkboxes.forEach(cb => { if (cb !== checkbox) { cb.checked = false; } }); } </script>
+
+      <div id="input3">
+      <label>パラメータ入力1 (文字):</label>
+      <input type="text" id="value03" name="value03" value="{{value03}}">
+    </div>
+
+    <div id="input4">
+      <label>パラメータ入力2 (数字):</label>
+      <input type="number" id="value04" name="value04" value="{{value04}}">
+    </div>
+
+    <div id="input5">
+      <label>パラメータ入力2 (数字):</label>
+      <input type="number" id="value05" name="value05" value="{{value05}}">
+    </div>
+
+    <p id="noInput" class="hidden">入力項目はありません</p>
+
+    <input type="submit" value="送信">
+
+    <p>condition:{{condition}}</p>
+    <p>value01:{{dropdown201}}</p>
+    <p>value02:{{value02}}</p>
+    <p>value02:{{value02a}}</p>
+    <p>value02:{{value02b}}</p>
+    <p>value03:{{value03}}</p>
+    <p>value04:{{value04}}</p>
+
+  </form>
+
+<script>
+  // 条件ごとの表示設定をオブジェクトで管理
+  const displaySettings = {
+    "0501": { input1: true, input2: true, input3: true, input4: true },
+    "0502": { input1: true, input2: false, input3: true, input4: true },
+    "0503": { input1: false, input2: true, input3: false, input4: true },
+    "0504": { input1: false, input2: false, input3: false, input4: false }
+  };
+
+  function toggleInputs() {
+    const condition = document.getElementById("condition").value;
+    const noInput = document.getElementById("noInput");
+
+    // 全ての入力項目を一旦非表示にする
+    document.querySelectorAll('[id^="input"]').forEach(input => {
+      input.style.display = "none";
+    });
+    noInput.classList.add("hidden");
+
+    // 条件に基づき、表示を制御
+    if (displaySettings[condition]) {
+      const settings = displaySettings[condition];
+      let hasVisibleInput = false;
+
+      for (const [inputId, isVisible] of Object.entries(settings)) {
+        const element = document.getElementById(inputId);
+        if (element && isVisible) {
+          element.style.display = "block";
+          hasVisibleInput = true;
+        }
+      }
+
+      // すべて非表示の場合、"入力項目はありません"メッセージを表示
+      if (!hasVisibleInput) {
+        noInput.classList.remove("hidden");
+      }
+    }
+  }
+
+  // 初期状態で実行
+  toggleInputs();
+</script>
+
+</body>
+</html>

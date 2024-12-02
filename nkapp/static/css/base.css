@@ -76,6 +76,16 @@ header a {
   margin-top: 60px;
   margin-bottom: 30px;
 }
+.main-content label {
+  display: inline-block;
+  width:        100px; /* ラベルの幅を調整 */
+  margin-right: 5px;
+  margin-bottom: 3px;
+}
+.main-content input {
+  text-align: right;
+  margin-bottom: 3px;
+}
 
 /* テーブル行の背景色を設定 */
 .table-header-row {
@@ -163,13 +173,6 @@ footer a {
 .card p {
   margin: 8px 0;
 }
-/*
-.child { display: none; margin-left: 20px; }
-.caret-down .child { display: block; }
-.caret { cursor: pointer; }
-.icon { display: inline-block; width: 16px; height: 16px; text-align: center; }
-*/
-
 ul, #myUL {
 list-style-type: none;
 }
@@ -190,7 +193,7 @@ font-size: 20px;
 }
 .child {
 display: none; /* ページロード時は非表示 */
-margin-left: 50px; /* 親からのインデント */
+margin-left: 20px; /* 親からのインデント */
 }
 .caret::before {
   content: "▶";   /* マークの指定 */

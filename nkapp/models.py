@@ -1,5 +1,5 @@
 """ models.py """
-from sqlalchemy import Column, Float, Date, create_engine
+from sqlalchemy import Column, Float, Date, create_engine,Sequence
 from sqlalchemy import Table, Index, Integer, String, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, aliased
@@ -94,6 +94,17 @@ class DailyQuotesAll(Base):
     )
 
 
+# シーケンスを定義し、開始値を10000に設定
+trade_date_no_seq = Sequence('trade_date_no_seq', start=10000)
+class TradingCalendar(Base):
+    """株価4本値テーブルの定義（一括）"""
+
+    __tablename__ = "trading_calendar"
+
+    id            = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    tradingdate   = Column(Date, nullable=False)
+    trade_date_no = Column(Integer, trade_date_no_seq, server_default=trade_date_no_seq.next_value())
+
 class Tl:
     """Table Lists"""
 
@@ -103,3 +114,4 @@ class Tl:
     current_db = SQLALCHEMY_DATABASE_URI
     company = aliased(ListedInfo)
     daily = aliased(DailyQuotesAll)
+    t_calendar = Table("trading_calendar", metadata, autoload_with=engine)

@@ -20,6 +20,7 @@ class Infoparams:
         endpoint = "rpt.info_all"  # self-endpoint
         return_url = "rpt.main"  # return-endpoint
         return_name = "レポートに戻る"  # return_name
+        home_url = "nkapp.index"  # home-url
         current_time = Config.get_current_time()
         page = request.args.get("page", 1, type=int)
         per_page = Reportparams.per_page
@@ -36,6 +37,7 @@ class Infoparams:
             "endpoint": endpoint,
             "return_url": return_url,
             "return_name": return_name,
+            "home_url": home_url,
             "db_data": lists,
             "total_records": counts,
             "total_pages": total_pages,
@@ -156,6 +158,7 @@ class Infoparams:
         header_title = "上場銘柄一覧 (Listed_Info)"  # header_info
         endpoint = "rpt.info_list2"  # self-endpoint
         return_url = "rpt.main"  # return-endpoint
+        home_url = "nkapp.index"  # home-url
         return_name = "レポートに戻る"  # return_name
         page = request.args.get("page", 1, type=int)
         per_page = 15
@@ -200,6 +203,7 @@ class Infoparams:
                 "endpoint": endpoint,
                 "return_url": return_url,
                 "return_name": return_name,
+                "home_url": home_url,
                 "db_data": lists,
                 "total_records": counts,
                 "total_pages": total_pages,

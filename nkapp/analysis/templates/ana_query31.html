@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analysis</title>
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/base.css') }}"
+  />
+  <style>
+    .tree-item {
+        display: none;
+        margin-left: 10px;
+    }
+    .parent {
+        cursor: pointer;
+        font-weight: bold;
+    }
+    .hidden {
+      display: none;
+    }
+
+  </style>
+  <script src="/static/js/treeview.js"></script>
+</head>
+<body>
+  <div class="sidebar">
+    <ul>
+      <br><br>
+      <li><a href={{ url_for('analysis.analysis_query31') }}
+        target="_blank" rel="noopener noreferrer"
+        >Analysis31</a></li>
+      <li><a href={{ url_for('rpt.main') }}
+        target="_blank" rel="noopener noreferrer"
+        >Reports</a></li>
+      <li><a href="https://jpx-jquants.com/auth/signin"
+        target="_blank" rel="noopener noreferrer"
+        >APIs</a></li>
+      <li><a href={{ url_for('analysis.builder') }}
+        target="_blank" rel="noopener noreferrer"
+        >Parameters</a></li>
+      <li><a href="http://localhost:8888/lab"
+        target="_blank" rel="noopener noreferrer"
+        >Jupyter Lab</a></li>
+      <br><br><br>
+      <a href="{{ url_for(return_url) }}"> {{return_name}} </a>
+      <br><br>
+      <a href="{{ url_for(home_url) }}"> Home </a>
+      <br><br>
+      <h5>{{ current_db }}</h5><br>
+      <h4>Table1: listed_info</h4>
+        <p>Last Updated:</p>
+        <p>{{ last_update_info }} ; {{ record_count_info }}records</p>
+      <br>
+      <h4>Table2: Daily_Quotes_All</h4>
+      <p>Last Updated:</p><br>
+      <p>{{ last_update_all }} ; {{ record_count_all }}records</p>
+      <br><br><br><br><br><br><br><br>
+    </ul>
+  </div>
+  <div class="main-content">
+    <header>
+      <h1>Analysis</h1>
+    </header>
+    <section>
+      <h2>Query Setting</h2>
+        <form action="/nkapp/analysis/query_builder2" method="POST">
+          <label for="dropdown001" style="width:50px; display:inline-block;">Query:</label>
+          <select name="dropdown001" id="dropdown001" onchange="toggleInputs()">
+            <option value="0501">選択してください</option>
+            {% for value, text in VALUE_MAP50.items() %}
+              <option value="{{ value }}" {% if condition001==value %}selected{% endif %}>{{ text }}</option>
+            {% endfor %}
+          </select>
+          <input type="submit" value="登録">
+        </form>
+        <h3>{{error}}</h3><br>
+        <h3>Market Condition</h3>
+          <tr>
+            <td>Category:</td>
+            <td>{{marketcategory}}</td>
+          </tr><br>
+          <tr>
+            <td>Selected:</td>
+            <td>{{categorydetail}}</td>
+          </tr>
+
+        <form action="/nkapp/analysis/analysis_query31" method="POST">
+
+        <h3>Group A</h3>
+        <div id="input101">
+          <label for="dropdown101">移動平均:</label>
+          <select name="dropdown101" id="dropdown101" required>
+              <option value="{{window101}}">選択してください</option>
+              <option value="{{ma_value01}}" {% if ma_value01 == window101 %}selected{% endif %}>MA1:{{ma_value01}}days</option>
+              <option value="{{ma_value02}}" {% if ma_value02 == window101 %}selected{% endif %}>MA2:{{ma_value02}}days</option>
+              <option value="{{ma_value03}}" {% if ma_value03 == window101 %}selected{% endif %}>MA3:{{ma_value03}}days</option>
+              <option value="{{ma_value04}}" {% if ma_value04 == window101 %}selected{% endif %}>MA4:{{ma_value04}}days</option>
+              <option value="{{ma_value05}}" {% if ma_value05 == window101 %}selected{% endif %}>MA5:{{ma_value05}}days</option>
+          </select>
+        </div>
+        <div id="input102">
+          <p>Formula:{{comment102}}</p>
+        </div>
+
+        <div id="input111">
+          <label for="gap111"> {{daygapname111}}:</label>
+          <input type="number" style="width:50px" min="0" max="400" step="1" id="gap111"
+          name="gap111" value="{{ gapquery111 }}">
+        </div>
+
+        <div id="input121">
+          <label for="param121"> {{paramname121}}:</label>
+          <input type="number" style="width:50px" step="0.1" id="param121"
+          name="param121" value="{{paramquery121}}"><br>
+        </div>
+
+        <div id="input122">
+          <label for="param122"> {{paramname122}}:</label>
+          <input type="number" style="width:50px" step="0.1" id="param122"
+          name="param122" value="{{paramquery122}}"><br>
+        </div>
+
+        <div id="input123">
+          <p>{{subject123}}:{{comment123}}</p>
+        </div>
+        <div id="input124">
+          <p>{{subject124}}:{{comment124}}</p>
+        </div>
+        <div id="input125">
+          <p>{{subject125}}:{{comment125}}</p>
+        </div>
+
+        <div id="input131">
+          <h3>Operator</h3>
+            <label for="dropdown131">演算子:</label>
+            <select name="dropdown131" id="dropdown131" >
+              <option value="">選択してください</option>
+              {% for value, text in VALUE_MAP30.items() %}
+                <option value="{{ value }}" {% if value == ope_select131 %}selected{% endif %}>{{ text }}</option>
+              {% endfor %}
+            </select>
+        </div>
+
+        <h3>Group B</h3>
+        <div id="input201">
+          <label for="dropdown201">移動平均:</label>
+          <select name="dropdown201" id="dropdown201" required>
+              <option value="{{window101}}">選択してください</option>
+              <option value="{{ma_value01}}" {% if ma_value01 == window201 %}selected{% endif %}>MA1:{{ma_value01}}days</option>
+              <option value="{{ma_value02}}" {% if ma_value02 == window201 %}selected{% endif %}>MA2:{{ma_value02}}days</option>
+              <option value="{{ma_value03}}" {% if ma_value03 == window201 %}selected{% endif %}>MA3:{{ma_value03}}days</option>
+              <option value="{{ma_value04}}" {% if ma_value04 == window201 %}selected{% endif %}>MA4:{{ma_value04}}days</option>
+              <option value="{{ma_value05}}" {% if ma_value05 == window201 %}selected{% endif %}>MA5:{{ma_value05}}days</option>
+          </select>
+        </div>
+        <div id="input202">
+          <p>Formula:{{comment202}}</p>
+        </div>
+
+        <div id="input211">
+          <label for="gap211"> {{daygapname211}}:</label>
+          <input type="number" style="width:50px" min="0" max="400" step="1" id="gap211"
+          name="gap211" value="{{ gapquery211 }}">
+        </div>
+
+        <div id="input221">
+          <label for="param221"> {{paramname221}}:</label>
+          <input type="number" style="width:50px" step="0.1" id="param221"
+          name="param221" value="{{paramquery221}}"><br>
+        </div>
+
+        <div id="input222">
+          <label for="param222"> {{paramname222}}:</label>
+          <input type="number" style="width:50px" step="0.1" id="param122"
+          name="param222" value="{{paramquery222}}"><br>
+        </div>
+
+        <div id="input223">
+          <p>{{subject223}}:{{comment223}}</p>
+        </div>
+        <div id="input224">
+          <p>{{subject224}}:{{comment224}}</p>
+        </div>
+        <div id="input225">
+          <p>{{subject225}}:{{comment225}}</p>
+        </div>
+
+        <br>
+        <h3>Display Pannel</h3>
+        <label for="dropdown501">ソート順:</label>
+        <select name="dropdown501" id="dropdown501" >
+          <option value="">選択してください</option>
+          {% for value, text in VALUE_MAP40.items() %}
+            <option value="{{ value }}" {% if value == sort_select501 %}selected{% endif %}>{{ text }}</option>
+          {% endfor %}
+        </select>
+        <div id="input502">
+          <p>Key Column: {{comment502}}</p>
+        </div>
+        <br>
+
+        <p id="noInput" class="hidden">入力項目はありません</p>
+
+        <input type="submit" value="検索">
+        <br><br>
+        <div id="input511">
+          <h4>Save Option</h4>
+            <form action="/nkapp/analysis/analysis_query31" method="POST">
+              <input type="checkbox" id="ckbox511" name="ckbox511" value="ckbox511"
+              {% if ckbox511 %}checked{% endif %} >
+              <label for="ckbox511">Active:</label>
+              <input type="checkbox" id="ckbox512" name="ckbox512" value="ckbox512"
+              {% if ckbox512 %}checked{% endif %} >
+              <label for="ckbox512"> Timestamp:</label>
+              <br>
+              <input type="checkbox" id="ckbox521" name="ckbox521" value="ckbox521"
+              {% if ckbox521 %}checked{% endif %} >
+              <label for="data521">Data(.csv):</label>
+              <input type="text" id="data521" name="data521" value="{{data521}}" style="flex: 1;text-align: left;">
+              <br>
+              <input type="checkbox" id="ckbox531" name="ckbox531" value="ckbox531"
+              {% if ckbox531 %}checked{% endif %} >
+              <label for="conf531">Config(.json):</label>
+              <input type="text" id="conf531" name="conf531" value="{{conf531}}" style="flex: 1;text-align: left;">
+              <br>
+              <div id="input541">
+                <p>{{subject541}}</p>
+                <p>{{comment541}}</p>
+              </div>
+            </form>
+            <br>
+            <form action="/nkapp/analysis/reset_option" method="POST">
+              <input type="submit" value="Reset">
+            </form>
+          </div>
+
+
+
+        <div class="parent caret" onclick="toggleVisibility(this)">
+          Parameters
+        </div>
+        <div class="child">
+          <p>condition    :{{condition}}</p>
+          <p>condition001 :{{condition001}}</p>
+          <p>window101    :{{window101}}</p>
+          <p>gapquery111  :{{gapquery111}}</p>
+          <p>paramquery121:{{paramquery121}}</p>
+          <p>paramquery122:{{paramquery122}}</p>
+          <p>ope_select131:{{ope_select131}}</p>
+
+          <p>window201     :{{window201}}</p>
+          <p>gapquery211   :{{gapquery211}}</p>
+          <p>paramquery221 :{{paramquery221}}</p>
+          <p>paramquery222 :{{paramquery222}}</p>
+          <p>sort_select501:{{sort_select501}}</p>
+          <p>Active        :{{ckbox511}}</p>
+          <p>Timestamp     :{{ckbox512}}</p>
+          <p>DATA          :{{ckbox521}}</p>
+          <p>Config        :{{ckbox531}}</p>
+          <p>DATA_csv      :{{data521}}</p>
+          <p>Config_json   :{{conf531}}</p>
+
+          <br>
+          <p>marketcode       :{{marketcode}}</p>
+          <p>selected10       :{{selected10}}</p>
+          <p>rsi_period_value :{{rsi_period_value}}</p>
+          <p>macd_short_value :{{macd_short_value}}</p>
+          <p>macd_long_value  :{{macd_long_value}}</p>
+          <p>macd_signal_value:{{macd_signal_value}}</p>
+          <p>query_time       :{{query_time}}</p>
+          <p>total_records    :{{ total_records }}</p>
+        </div>
+      </form>
+
+      <script>
+        // 条件ごとの表示設定をオブジェクトで管理
+        const displaySettings = {
+          "0501": { input101: true, input111: true, input121: false, input122: false, input131:true,
+            input201: false, input211: false, input221: true, input222: false,
+            input102: false, input123: false, input124: false, input125: false,
+            input202: true, input223: false, input224: false, input225: false,
+            input502: true, input511: false},
+          "0502": { input101: true, input111: true, input121: false, input122: false, input131:false,
+            input201: true, input211: false, input221: false, input222: false,
+            input102: false, input123: false, input124: false, input125: false,
+            input202: false, input223: false, input224: false, input225: false,
+            input502: true, input511: false},
+          "0503": { input101: true, input111: true, input121: false, input122: false, input131:false,
+            input201: true, input211: false, input221: false, input222: false,
+            input102: false, input123: false, input124: false, input125: false,
+            input202: false, input223: false, input224: false, input225: false,
+            input502: true, input511: false},
+          "0504": { input101: true, input111: true, input121: false, input122: false, input131:true,
+            input201: false, input211: false, input221: false, input222: false,
+            input102: false, input123: false, input124: false, input125: false,
+            input202: true, input223: false, input224: false, input225: false,
+            input502: true, input511: false},
+          "0511": { input101: false, input111: true, input121: false, input122: false, input131:true,
+            input201: false, input211: false, input221: true, input222: false,
+            input102: true, input123: false, input124: false, input125: false,
+            input202: false, input223: false, input224: false, input225: false,
+            input502: true, input511: false},
+          "0521": { input101: false, input111: false, input121: false, input122: false, input131:false,
+            input201: false, input211: false, input221: false, input222: false,
+            input102: true, input123: true, input124: false, input125: false,
+            input202: false, input223: true, input224: false, input225: false,
+            input502: true, input511: false},
+          "0523": { input101: false, input111: false, input121: false, input122: false, input131:true,
+            input201: false, input211: false, input221: false, input222: false,
+            input102: true, input123: true, input124: false, input125: false,
+            input202: false, input223: true, input224: false, input225: false,
+            input502: true, input511: false},
+          "0591": { input101: true, input111: true, input121: true, input122: true, input131:true,
+            input201: true, input211: true, input221: true, input222: true,
+            input102: true, input123: true, input124: true, input125: true,
+            input202: true, input223: true, input224: true, input225: true,
+            input502: true, input511: true},
+          "0592": { input101: false, input111: false, input121: false, input122: false, input131:false,
+            input201: false, input211: false, input221: false, input222: false,
+            input102: false, input123: false, input124: false, input125: false,
+            input202: false, input223: false, input224: false, input225: false,
+            input502: false, input511: false},
+          "0599": { input101: false, input111: false, input121: false, input122: false, input131:false,
+            input201: false, input211: false, input221: false, input222: false,
+            input102: true, input123: false, input124: false, input125: false,
+            input202: true, input223: false, input224: false, input225: false, 
+            input502: true, input511: true, input541: true},
+        };
+
+        function toggleInputs() {
+          const condition = document.getElementById("dropdown001").value;
+          const noInput = document.getElementById("noInput");
+
+          // 全ての入力項目を一旦非表示にする
+          document.querySelectorAll('[id^="input"]').forEach(input => {
+            input.style.display = "none";
+          });
+          noInput.classList.add("hidden");
+
+          // 条件に基づき、表示を制御
+          if (displaySettings[condition]) {
+            const settings = displaySettings[condition];
+            let hasVisibleInput = false;
+
+            for (const [inputId, isVisible] of Object.entries(settings)) {
+              const element = document.getElementById(inputId);
+              if ( element && isVisible) {
+                element.style.display = "block";
+                hasVisibleInput = true;
+              }
+            }
+
+            // すべて非表示の場合、"入力項目はありません"メッセージを表示
+            if (!hasVisibleInput) {
+              noInput.classList.remove("hidden");
+            }
+          }
+        }
+
+        // 初期状態で実行
+        toggleInputs();
+      </script>
+
+    </section>
+    <footer>
+      <p>ana_query</p>
+      <p>© 2024 SWFSOMA013 All Rights Reserved.</p>
+      <p>{{ current_time }}</p>
+    </footer>
+  </div>
+  <div class="card-container">
+    <div class="card">
+        {% if db_data == [] %}
+          {% if initial == 1 %}
+            <p>===Sub-Pannel===</p>
+          {% else %}
+            <p>該当するデータが見つかりません。</p>
+            <a href="javascript:history.back()">Previous</a>
+            {% endif %}
+        {% else %}
+        <h3>検索ワード：{{ filters }}</h3>
+          <p>
+            {% set end = page * per_page %}
+            {% if end > total_records %}
+                {% set end = total_records %}
+            {% endif %}
+            全{{ total_records }}件中 {{ (page - 1) * per_page + 1 }}-{{ end }}件目を表示
+          </p>
+          {% if page > 1 %}
+            <a href="{{ url_for(endpoint, page=page-1) }}">前のページ</a>
+          {% endif %}
+          {% if page < total_pages %}
+            <a href="{{ url_for(endpoint, page=page+1) }}">次のページ</a>
+          {% endif %}
+          <table border= "1">
+                <tr>
+                    <th>銘柄コード</th>
+                    <th>会社名</th>
+                    <th>{{column_name}}</th>
+                </tr>
+                {% for db in db_data %}
+                    <tr>
+                        <td><a href="{{ url_for('rpt.tstock_query10', code=db.code) }}">{{ db['code'] or db[0] }}</a></td>
+                        <td><a href="{{ url_for('rpt.info_card', code=db.code) }}">{{ db['companyname'] or db[1]}}</a></td>
+                        <td> {{ "%.2f" | format(db[2]) }} </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    </div>
+  </div>
+</body>
+</html>

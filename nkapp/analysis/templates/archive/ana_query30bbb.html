@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Analysis</title>
+  <style>
+    .hidden { display: none; }
+  </style>
+  <script src="/static/js/dropdown.js"></script>
+</head>
+<body>
+  <h1>Analysis</h1>
+  <h2>Query Setting</h2>
+    <form action="/nkapp/analysis/analysis_query30aaa" method="POST">
+      <h3>Calculation-Condition</h3>
+
+        <label for="dropdown001">Select Condition:</label>
+        <select name="dropdown001" id="dropdown001" >
+          <option value="">選択してください</option>
+          {% for value, text in VALUE_MAP50.items() %}
+            <option value="{{ value }}" {% if dropdown001==value %}selected{% endif %}>{{ text }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="condition">条件を選択:</label>
+        <select id="condition" name="condition" onchange="toggleInputs()">
+          <option value="0501"{% if condition =="0501"%}selected{% endif %}>0501</option>
+          <option value="0502"{% if condition =="0502"%}selected{% endif %}>0502</option>
+          <option value="0503"{% if condition =="0503"%}selected{% endif %}>0503</option>
+          <option value="0504"{% if condition =="0504"%}selected{% endif %}>0504</option>
+        </select>
+        <br>
+        <h3>Calc-Group A</h3>
+
+        <h4>Condition Pannel-A</h4>
+        <div id="input101">
+          <label for="dropdown101">移動平均:</label>
+          <select name="dropdown101" id="dropdown101" >
+              <option value="{{window_101}}">選択してください</option>
+              <option value="{{ma_value01}}" {% if window_101 == ma_value01 %}selected{% endif %}>MA1:{{ma_value01}}days</option>
+              <option value="{{ma_value02}}" {% if window_101 == ma_value02 %}selected{% endif %}>MA2:{{ma_value02}}days</option>
+              <option value="{{ma_value03}}" {% if window_101 == ma_value03 %}selected{% endif %}>MA3:{{ma_value03}}days</option>
+              <option value="{{ma_value04}}" {% if window_101 == ma_value04 %}selected{% endif %}>MA4:{{ma_value04}}days</option>
+              <option value="{{ma_value05}}" {% if window_101 == ma_value05 %}selected{% endif %}>MA5:{{ma_value05}}days</option>
+          </select>
+        </div>
+        <div id="input111">
+          <label for="gap111">{{daygapname101}}:</label>
+          <input type="number" style="width:50px" id="gap111"
+          name="gap111" value="{{ gapquery111 }}" min="0" max="400" step="1">
+        </div>
+        <div id="input121">
+          <label for="param121"> {{paramname121}}:</label>
+          <input type="number" style="width:50px" step="0.01" id="param121"
+          name="param121" value="{{paramquery121}}"><br>
+        </div>
+        <div id="input122">
+          <label for="param122"> {{paramname122}}:</label>
+          <input type="number" style="width:50px" step="0.01" id="param122"
+          name="param122" value="{{paramquery122}}"><br>
+        </div>
+        <br>
+
+      <h3>Operator</h3>
+
+        <div id="input131">
+          <label for="dropdown131">演算子:</label>
+          <select name="dropdown131" id="dropdown131" >
+            <option value="">選択してください</option>
+            {% for value, text in VALUE_MAP30.items() %}
+              <option value="{{ value }}" {% if value == ope_select131 %}selected{% endif %}>{{ text }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+      <h3>Display Pannel</h3>
+        <label for="dropdown501">ソート順:</label>
+        <select name="dropdown501" id="dropdown501" >
+          <option value="">選択してください</option>
+          {% for value, text in VALUE_MAP40.items() %}
+            <option value="{{ value }}" {% if value == sort_select501 %}selected{% endif %}>{{ text }}</option>
+          {% endfor %}
+        </select>
+        <br><br>
+      <input type="submit" value="送信">
+    </form>
+    <p>==============================================</p>
+    <p>condition001:{{condition001}}</p>
+    <p>sort_select501:{{sort_select501}}</p>
+
+
+    <br>
+    <script>
+    // 条件ごとの表示設定をオブジェクトで管理
+    const displaySettings = {
+      "0501": { input101: true, input111: true, input121: true, input122: true },
+      "0502": { input101: false, input111: false, input121: false, input122: false },
+      "0503": { input101: true, input111: true, input121: false, input122: true },
+      "0504": { input101: true, input111: false, input121: false, input122: false }
+    };
+    function toggleInputs() {
+      const condition = document.getElementById("condition").value;
+      const noInput = document.getElementById("noInput");
+
+      // 全ての入力項目を一旦非表示にする
+      document.querySelectorAll('[id^="input"]').forEach(input => {
+        input.style.display = "none";
+      });
+      noInput.classList.add("hidden");
+
+      // 条件に基づき、表示を制御
+      if (displaySettings[condition]) {
+        const settings = displaySettings[condition];
+        let hasVisibleInput = false;
+
+        for (const [inputId, isVisible] of Object.entries(settings)) {
+          const element = document.getElementById(inputId);
+          if (element && isVisible) {
+            element.style.display = "block";
+            hasVisibleInput = true;
+          }
+        }
+
+        // すべて非表示の場合、"入力項目はありません"メッセージを表示
+        if (!hasVisibleInput) {
+          noInput.classList.remove("hidden");
+        }
+      }
+    }
+
+    // 初期状態で実行
+    toggleInputs();
+    </script>
+</body>
+</html>

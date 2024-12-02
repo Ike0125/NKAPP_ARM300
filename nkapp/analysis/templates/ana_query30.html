@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analysis</title>
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/base.css') }}"
+  />
+  <style>
+    .tree-item {
+        display: none;
+        margin-left: 20px;
+    }
+    .parent {
+        cursor: pointer;
+        font-weight: bold;
+    }
+  </style>
+  <script src="/static/js/dropdown.js"></script>
+</head>
+<body>
+  <div class="sidebar">
+    <ul>
+      <br><br>
+      <li><a href={{ url_for('analysis.analysis_query') }}>Analysis</a></li>
+      <li><a href={{ url_for('analysis.analysis_query30') }}>Analysis30</a></li>
+      <li><a href="{{ url_for('rpt.main') }}">Reports</a></li>
+      <li><a href="https://jpx-jquants.com/auth/signin">APIs</a></li>
+      <li><a href={{ url_for('analysis.builder') }}>Parameters</a></li>
+      <li><a href="http://localhost:8888/lab">Jupyter Lab</a></li>
+      <br><br><br>
+      <a href="{{ url_for(return_url) }}"> {{return_name}} </a>
+      <br><br>
+      <a href="{{ url_for(home_url) }}"> Home </a>
+      <br><br>
+      <h5>{{ current_db }}</h5><br>
+      <h4>Table1: listed_info</h4>
+        <p>Last Updated:</p>
+        <p>{{ last_update_info }} ; {{ record_count_info }}records</p>
+      <br>
+      <h4>Table2: Daily_Quotes_All</h4>
+      <p>Last Updated:</p><br>
+      <p>{{ last_update_all }} ; {{ record_count_all }}records</p>
+      <br><br><br><br><br><br><br><br>
+    </ul>
+  </div>
+  <div class="main-content">
+    <header>
+      <h1>Analysis</h1>
+    </header>
+    <section>
+      <h3>Query Setting</h3>
+      <h4>Calc-Group A</h3>
+      <form action="/nkapp/analysis/analysis_query30" method="POST">
+        <h4>Operator</h4>
+          <label for="dropdown130">演算子:</label>
+          <select name="dropdown130" id="dropdown130" required>
+            <option value="">選択してください</option>
+            {% for value, text in VALUE_MAP30.items() %}
+              <option value="{{ value }}" {% if value == ope_select130 %}selected{% endif %}>{{ text }}</option>
+            {% endfor %}
+          </select>
+        <h4>Calc-Condition Pannel-A</h4>
+          <label for="dropdown101">計算方法:</label>
+          <select name="dropdown101" id="dropdown101" data-target="fieldGroup1" required>
+            <option value="">選択してください</option>
+            {% for value, text in VALUE_MAP20.items() %}
+              <option value="{{ value }}" {% if value == cal_select101 %}selected{% endif %}>{{ text }}</option>
+            {% endfor %}
+          </select><br>
+          <div id="fieldGroup1">
+            <div data-value="0201" class="field">
+              <label for="gap101">{{ daygap101 }}:</label>
+              <input type="number" style="width:50px" id="gap101" name="gap101" value="{{ gapquery101 }}" min="0" max="400" step="1">
+              <label for="dropdown201">移動平均:</label>
+              <select name="dropdown201" id="dropdown201" required>
+                  <option value="{{window_201}}">選択してください</option>
+                  <option value="{{ma_value01}}" {% if ma_value01 == window_201 %}selected{% endif %}>MA1:{{ma_value01}}days</option>
+                  <option value="{{ma_value02}}" {% if ma_value02 == window_201 %}selected{% endif %}>MA2:{{ma_value02}}days</option>
+                  <option value="{{ma_value03}}" {% if ma_value03 == window_201 %}selected{% endif %}>MA3:{{ma_value03}}days</option>
+                  <option value="{{ma_value04}}" {% if ma_value04 == window_201 %}selected{% endif %}>MA4:{{ma_value04}}days</option>
+                  <option value="{{ma_value05}}" {% if ma_value05 == window_201 %}selected{% endif %}>MA5:{{ma_value05}}days</option>
+              </select><br>
+            </div>
+            <br>
+          </div>
+          <label for="gap101"> {{daygap101}}:</label>
+          <input type="number" style="width:50px" id="gap101"
+          name="gap101" value="{{gapquery101}}" min="0" max="400" step="1"></input>
+          <br>
+          <label for="param101"> {{paramname101}}:</label>
+          <input type="number" style="width:50px" step="0.01" id="param101"
+          name="param101" value="{{paramquery101}}"></input><br>
+          <label for="param102"> {{paramname102}}:</label>
+          <input type="number" style="width:50px" step="0.01" id="param102"
+          name="param102" value="{{paramquery102}}"></input><br>
+          <br><br>
+        <h4>Calc-Condition Pannel-B</h4>
+          <label for="dropdown102">計算方法:</label>
+          <select name="dropdown102" id="dropdown102" Data-target="fieldGroup2" required>
+            <option value="">選択してください</option>
+            {% for value, text in VALUE_MAP20.items() %}
+              <option value="{{ value }}" {% if value == cal_select102 %}selected{% endif %}>{{ text }}</option>
+            {% endfor %}
+          </select><br>
+          <div id="fieldGroup2">
+            <div data-value="0500" class="field">
+              <label for="param103"> {{paramname103}}:</label>
+              <input type="number" style="width:50px" step="0.01" id="param103"
+              name="param103" value="{{paramquery103}}"></input><br>
+            </div>
+          </div>  
+          <label for="gap102"> {{daygap102}}:</label>
+          <input type="number" style="width:50px" id="gap102"
+          name="gap102" value="{{gapquery102}}" min="0" max="400" step="1"></input><br>
+          <label for="param103"> {{paramname103}}:</label>
+          <input type="number" style="width:50px" step="0.01" id="param103"
+          name="param103" value="{{paramquery103}}"></input><br>
+          <label for="param104"> {{paramname104}}:</label>
+          <input type="number" style="width:50px" step="0.01" id="param104"
+          name="param104" value="{{paramquery104}}"></input><br>
+          <br>
+        <h4>Calc-Condition Pannel-C</h4>
+        <h4>Display Pannel</h4>
+        <label for="dropdown140">ソート順:</label>
+        <select name="dropdown140" id="dropdown140" required>
+          <option value="">選択してください</option>
+          {% for value, text in VALUE_MAP40.items() %}
+            <option value="{{ value }}" {% if value == sort_select140 %}selected{% endif %}>{{ text }}</option>
+          {% endfor %}
+        </select>
+        <br><br>
+        <input type="submit" value="送信"></input>
+      </form>
+      <p>==============================================</p>
+      <br>
+    </section>
+    <footer>
+      <p>ana_query</p>
+      <p>© 2024 SWFSOMA013 All Rights Reserved.</p>
+      <p>{{ current_time }}</p>
+    </footer>
+  </div>
+  <div class="card-container">
+    <div class="card">
+        {% if db_data == [] %}
+          {% if initial == 1 %}
+            <p>===Sub-Pannel===</p>
+          {% else %}
+            <p>該当するデータが見つかりません。</p>
+            <a href="javascript:history.back()">Previous</a>
+            {% endif %}
+        {% else %}
+        <h3>検索ワード：{{ filters }}</h3>
+          <p>
+            {% set end = page * per_page %}
+            {% if end > total_records %}
+                {% set end = total_records %}
+            {% endif %}
+            全{{ total_records }}件中 {{ (page - 1) * per_page + 1 }}-{{ end }}件目を表示
+          </p>
+          {% if page > 1 %}
+            <a href="{{ url_for(endpoint, page=page-1) }}">前のページ</a>
+          {% endif %}
+          {% if page < total_pages %}
+            <a href="{{ url_for(endpoint, page=page+1) }}">次のページ</a>
+          {% endif %}
+          <table border= "1">
+                <tr>
+                    <th>銘柄コード</th>
+                    <th>会社名</th>
+                    <th>{{column_name}}</th>
+                </tr>
+                {% for db in db_data %}
+                    <tr>
+                        <td><a href="{{ url_for('rpt.tstock_query10', code=db.code) }}">{{ db.code }}</a></td>
+                        <td><a href="{{ url_for('rpt.info_card', code=db.code) }}">{{ db.companyname }}</a></td>
+                        <td>{{db[2] | round(1)}}</td>
+                      </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    </div>
+  </div>
+</body>
+</html>
