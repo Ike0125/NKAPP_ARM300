@@ -16,7 +16,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // クリックイベントで開閉とマーク切り替え
-        parent.addEventListener("click", () => {
+        parent.addEventListener("click", (event) => {
+            // チェックボックスがクリックされた場合は処理しない
+            if (event.target.tagName === "INPUT" && event.target.type === "checkbox") {
+                return;
+            }
+
             const currentlyOpen = child.style.display === "block";
             child.style.display = currentlyOpen ? "none" : "block";
 

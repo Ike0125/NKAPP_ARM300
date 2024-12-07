@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE <!DOCTYPE html>
 <html lang="ja">
     <head>
         <meta charset="UTF-8">
@@ -48,7 +48,11 @@
                         {% for db in db_data %}
                             <tr>
                                 <td class="text-center">{{db.date}}</td>
-                                <td class="text-center"><a href="{{ url_for('rpt.info_card', code=db.daily_code) }}">{{ db.daily_code }}</a></td>
+                                <td class="text-center">
+                                    <a href="{{ url_for('rpt.info_card', code=db.daily_code) }}" target="_blank" rel="noopener noreferrer">
+                                        {{ db.daily_code }}
+                                    </a>
+                                </td>
                                 <td class="text-left">{{db.companyname}}</td>
                                 <td class="text-right">{{db.adjustmentopen}}</td>
                                 <td class="text-right">{{db.adjustmenthigh}}</td>

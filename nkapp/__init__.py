@@ -1,7 +1,7 @@
 """  __init__.py  """
 from flask import Flask
 # from nkapp.tests.testdb import create_books_table
-from .models import create_sql_table
+# from .models import create_sql_table
 from .routes import bp_nkapp        # nkappのblueprint
 from .rpt.routes import bp_rpt      # reportのblueprint
 # from .api.routes import bp_api      # apiのblueprint
@@ -15,7 +15,7 @@ def create_nkapp():
     nkapp.secret_key = 'arm200_secret_key'  #dropdownlist用
     # create_books_table()
     # テスト用DB,book作成
-    create_sql_table()
+    # create_sql_table()
     # SQL_DB用接続、作成
     # Blueprint registration
     nkapp.register_blueprint(bp_nkapp, url_prefix='/nkapp')         # Main

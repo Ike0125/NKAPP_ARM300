@@ -1,12 +1,15 @@
 """  nkapp.config.py  """
 import datetime
+from datetime import date
 import os
 import json
 import pandas as pd
 from sqlalchemy import func
 from sqlalchemy.engine.row import Row
+from flask import session
 from flask import render_template
 from .models import Session, Tl
+from .analysis.analysis20 import Ana
 
 
 class Mainparams:
@@ -61,7 +64,7 @@ class Config:
     @staticmethod
     def get_current_time():
         """現在の日時取得"""
-        return datetime.now().strftime("%Y-%m-%d %H:%M")
+        return datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
     @staticmethod
     def render_analysis_template():
@@ -72,6 +75,35 @@ class Config:
             "analysis.html",
             current_time=current_time,
         )
+
+
+class TD:
+    """Trading Date Caluculation"""
+    @staticmethod
+    def date_tno(t_date):
+        """Convert actural date to trading number"""
+        t_no = 10000                # Trading Number
+        with Session() as session:  # セッション開始
+
+            # 取引日を使って取引日番号を計算
+            t_no = session.query(
+                Tl.t_calendar.c.trade_date_no
+            ).filter(Tl.t_calendar.c.tradingdate == t_date).scalar()
+
+        return t_no
+
+    @staticmethod
+    def tno_tdate(t_no):
+        """Convert trading number to trading date"""
+        t_date = date(2022, 6, 14)  # Trading Date
+        with Session() as session:  # セッション開始
+
+            # 取引日カレンダーから具体的な取引日を取得
+            t_date = session.query(
+                    Tl.t_calendar.c.tradingdate
+                ).filter(Tl.t_calendar.c.trade_date_no == t_no).scalar()
+
+        return t_date
 
 
 class Reportparams():
@@ -161,6 +193,33 @@ class Fileparams:
             return pd.DataFrame([data])
         else:
             raise ValueError("DataFrameに変換できないデータ形式です。")
+
+    @staticmethod
+    def fileread_csv():
+        """  Reading CSV file """
+        file_path = None
+        ana_config = Ana.load_config("ana_config.json")
+        file_path = ana_config.get("file_path")
+        if not file_path:
+            params={
+                "status": "notice",
+                "errormsg": "ファイルが選択されませんでした。",
+                "file_path": file_path
+            }
+            return params
+        try:
+            data = pd.read_csv(file_path)
+            print(data.head(10))
+            params={"status": "success-reading", "file_path": file_path, "data": data}
+            return params
+        except Exception as e:
+            params={
+                "status": "error",
+                "errormsg": f"ファイルの読み込み中にエラーが発生しました: {e}",
+                "file_path": file_path
+            }
+
+            return params
 
 
     @staticmethod

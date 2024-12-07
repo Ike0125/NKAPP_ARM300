@@ -64,15 +64,34 @@
 
     <input type="submit" value="送信">
 
-    <p>condition:{{condition}}</p>
-    <p>value01:{{dropdown201}}</p>
-    <p>value02:{{value02}}</p>
-    <p>value02:{{value02a}}</p>
-    <p>value02:{{value02b}}</p>
-    <p>value03:{{value03}}</p>
-    <p>value04:{{value04}}</p>
-
   </form>
+  <form action="/nkapp/analysis/select_file" method="POST">
+
+    <input type="submit" value="ファイル選択">
+  </form>
+  <form action="/nkapp/analysis/test_fileread" method="POST">
+
+    <input type="submit" value="ファイル読み込み">
+  </form>
+  <br>
+  <br>
+  <form action="/nkapp/analysis/reset_option_t" method="POST">
+
+    <input type="submit" value="reset">
+  </form>
+
+    <p>condition:{{condition}}</p>
+    <p>value01  :{{dropdown201}}</p>
+    <p>value02  :{{value02}}</p>
+    <p>value02  :{{value02a}}</p>
+    <p>value02  :{{value02b}}</p>
+    <p>value03  :{{value03}}</p>
+    <p>value04  :{{value04}}</p>
+    <p>file_path:{{file_path}}</p>
+    <p>status   :{{status}}</p>
+    <p>comment  :{{comment}}</p>
+    <p>errormsg :{{errormsg}}</p>
+
 
 <script>
   // 条件ごとの表示設定をオブジェクトで管理

@@ -66,6 +66,7 @@ def daily_query():
 def tstock_query10():                         # 移動平均データ付き
     """  Report BBS: Daily Quotes/ Prices """
     main_params = Infoparams10.tstock_query10()
+    # print("DEBUG: main_params =", main_params)
     return render_template("tstock_query10.html", **main_params)
 
 

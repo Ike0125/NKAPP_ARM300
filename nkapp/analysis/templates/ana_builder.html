@@ -53,6 +53,9 @@
         <h2>Market Params Setting</h2>
         <p>Click on the arrow(s) to open or close the tree branches.</p>
         <br>
+        <p>{{status}}:{{comment}}</p>
+        <p>{{errormsg}}</p>
+
         <form action="/nkapp/analysis/reg_marketcode" method="POST">
           <div class="parent caret" onclick="toggleVisibility(this)">
             Marketing Setting
@@ -146,22 +149,44 @@
             <br>
             <input type="submit" value="登録">
             <br><br>
-            <p>marketcategory : {{marketcategory}}</p>
-            <p>categorydetail : {{categorydetail}}</p>
-            <p>marketcode     : {{marketcode}}</p>
-            <p>sector17code   : {{sector17code}}</p>
-            <p>sector33code   : {{sector33code}}</p>
-            <p>scalecategory  : {{scalecategory}}</p>
-            <p>customcategory : {{customcategory}}</p>
-            <p>ckbox19:{{ckbox19}}</p>
-            <p>ckbox10:{{ckbox10}}</p>
-            <p>ckbox11:{{ckbox11}}</p>
-            <p>ckbox12:{{ckbox12}}</p>
-            <p>ckbox13:{{ckbox13}}</p>
-            <p>ckbox14:{{ckbox14}}</p>
+        </form>
+        <h4>Selected File for Custome-A</h4>
+          <p>File_Path : {{file_path}}</p>
+          <form action="/nkapp/analysis/select_csv" method="POST">
+            <input type="submit" value="select">
+          </form>
+          <form action="/nkapp/analysis/reset_csv" method="POST">
+            <input type="submit" value="reset">
+          </form>
+
+            <div class="parent caret" onclick="toggleVisibility(this)">
+              Parameters
+            </div>
+            <div class="child">
+              <p>ckbox19:{{ckbox19}}</p>
+              <p>ckbox10:{{ckbox10}}</p>
+              <p>ckbox11:{{ckbox11}}</p>
+              <p>ckbox12:{{ckbox12}}</p>
+              <p>ckbox13:{{ckbox13}}</p>
+              <p>ckbox14:{{ckbox14}}</p>
+
+              <p>marketcategory : {{marketcategory}}</p>
+              <p>categorydetail : {{categorydetail}}</p>
+              <p>marketcode     : {{marketcode}}</p>
+              <p>sector17code   : {{sector17code}}</p>
+              <p>sector33code   : {{sector33code}}</p>
+              <p>scalecategory  : {{scalecategory}}</p>
+              <p>customcategory : {{customcategory}}</p>
+
+              <p>status     : {{status}}</p>
+              <p>comment    : {{comment}}</p>
+              <p>errormsg   : {{errormsg}}</p>
+              <p>file_path  : {{file_path}}</p>
+
+            </div>
           </div>
           <br>
-        </form>
+
 
         <h2>Calculation Formula Setting</h2>
         <br>
@@ -245,6 +270,7 @@
             <tr>
               <td>Market:</td>
               <td>{{marketcategory}}</td>
+              <td>{{option_msg}}</td>
             </tr>
             <tr>
               <td>Selected:</td>

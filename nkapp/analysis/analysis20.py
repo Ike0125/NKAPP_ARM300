@@ -1,6 +1,7 @@
 """  nkapp.analysis.analysis20.py  """
 import json
 import os
+from tkinter import Tk, filedialog
 from flask import request, redirect, url_for
 # from nkapp.config import Config
 from .config import VALUE_MAP10, VALUE_MAP11, VALUE_MAP12, VALUE_MAP13, VALUE_MAP14
@@ -50,6 +51,10 @@ class Ana:
             "macd_short_value": ana_config.get('macd_short_value', None),
             "macd_long_value": ana_config.get('macd_long_value', None),
             "macd_signal_value": ana_config.get('macd_signal_value', None),
+            "file_path" : ana_config.get('file_path', None),
+            "status"    : request.args.get('status',""),
+            "comment"   : request.args.get('comment',""),
+            "errormsg"  : request.args.get('errormsg',""),
         }
         return config_builder
 
@@ -153,6 +158,10 @@ class Formulaparams:
     @staticmethod
     def register_rsi():
         """Registration rsi_config_params"""
+        status    = ""
+        comment   = ""
+        errormsg  = ""
+        msg_params = {}
         if request.method == "POST":
             config_rsi = {
                 "rsi_period_value": int(request.form.get("rsi_period_value","14")),
@@ -161,28 +170,42 @@ class Formulaparams:
             config_formula = Ana.load_config("ana_config.json")
             config_formula.update(config_rsi)
             Ana.save_config("ana_config.json",config_formula)
+            status = "Success-Registring"
         else:
             print("Post_RSIではありません")
-        return redirect(url_for('analysis.builder'))
+        msg_params={"status": status,"comment": comment,"errormsg": errormsg}
+        return redirect(url_for('analysis.builder', **msg_params))
 
 
     @staticmethod
     def register_macd():
         """Registration macd_config_params"""
+        status    = ""
+        comment   = ""
+        errormsg  = ""
+        msg_params = {}
+        config_formula = Ana.load_config("ana_config.json")
         if request.method == "POST":
             # 既存の設定を読み込み
             config_macd = {
                 "macd_short_value"    : int(request.form.get("macd_short_value", 7)),
                 "macd_long_value"     : int(request.form.get("macd_long_value", 14)),
-                "macd_signal_value"   : int(request.form.get("macd_signal_value", 9))
+                "macd_signal_value"   : int(request.form.get("macd_signal_value", 9)),
+                "file_path"           : None,
             }
+            status ="Success-Register"
+
             # print(f"config_macd: {config_macd}")
-            config_formula = Ana.load_config("ana_config.json")
             config_formula.update(config_macd)
             Ana.save_config("ana_config.json",config_formula)
         else:
-            print("Post_MACDではありません")
-        return redirect(url_for('analysis.builder'))
+            config_macd = {
+                "file_path"           : None,
+            }
+            config_formula.update(config_macd)
+            Ana.save_config("ana_config.json",config_formula)
+        msg_params={"status": status,"comment": comment,"errormsg": errormsg}
+        return redirect(url_for('analysis.builder', **msg_params))
 
 
 class Marketparams:
@@ -190,6 +213,10 @@ class Marketparams:
     @staticmethod
     def reg_marketcode():
         """Registration ma_config_params"""
+        status    = ""
+        comment   = ""
+        errormsg  = ""
+        msg_params = {}
         marketcategory = ""
         categorydetail = ""
         if request.method == "POST":
@@ -262,4 +289,69 @@ class Marketparams:
             Ana.save_config("ana_config.json",config_market)
         else:
             print("Post_Marketcodeではありません")
+        msg_params={"status": status,"comment": comment,"errormsg": errormsg}
+
+        return redirect(url_for('analysis.builder', **msg_params))
+
+
+    @staticmethod
+    def select_csv():
+        """  Reading CSV file with Windows """
+        file_path = None
+        status    = ""
+        errormsg  = ""
+        ana_config = Ana.load_config("ana_config.json")
+        if request.method == "POST":
+            root = Tk()
+            root.withdraw()  # Tkinterウィンドウを非表示にする
+            try:
+                file_path = filedialog.askopenfilename(title="CSVファイルを選択してください", filetypes=[("CSVファイル", "*.csv")])
+                if file_path:
+                    print(file_path)
+                    status = "success-selecting"
+                else:
+                    print("ファイルが選択されませんでした。")
+                    status = "notice"
+                    errormsg = "ファイルが選択されませんでした。"
+            except Exception as e:
+                status = "error",
+                errormsg = str(e),
+            finally:
+                root.destroy()  # リソース解放を確実に行う
+        else:
+            file_path = ana_config.get("file_path")
+        config_marketcode = {
+            "file_path" : file_path,
+            "status"    : status,
+            "errormsg"  : errormsg
+        }
+        print(f"config_marketcode: {config_marketcode}")
+        config_market = Ana.load_config("ana_config.json")
+        config_market.update(config_marketcode)
+        Ana.save_config("ana_config.json",config_market)
+        msg_params = {
+            "status"    : status,
+            "errormsg"  : errormsg
+        }
+
+        return redirect(url_for('analysis.builder', **msg_params))
+
+
+    @staticmethod
+    def reset_csv():
+        """Reset Params for Save Option"""
+        if request.method == "POST":
+            # 既存の設定を読み込み
+            reset_config = {
+                "file_path": None,
+                "status"    : "",
+                "errormsg"  : "",
+                "comment"   : ""
+            }
+            # print(f"config_macd: {config_macd}")
+            config_data = Ana.load_config("ana_config.json")
+            config_data.update(reset_config)
+            Ana.save_config("ana_config.json",config_data)
+        else:
+            print("Reset Error/reset_option/57")
         return redirect(url_for('analysis.builder'))

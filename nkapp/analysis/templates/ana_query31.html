@@ -75,139 +75,146 @@
           </select>
           <input type="submit" value="登録">
         </form>
-        <h3>{{error}}</h3><br>
+        <p>{{status}}:{{comment}}</P>
+        <h4>{{error}}{{errormsg}}</h4><br>
+
         <h3>Market Condition</h3>
-          <tr>
-            <td>Category:</td>
-            <td>{{marketcategory}}</td>
-          </tr><br>
-          <tr>
-            <td>Selected:</td>
-            <td>{{categorydetail}}</td>
-          </tr>
+        <tr>
+          <td>Category:</td>
+          <td>{{marketcategory}}</td>
+        </tr><br>
+        <tr>
+          <td>Selected:</td>
+          <td>{{categorydetail}}</td>
+        </tr>
 
         <form action="/nkapp/analysis/analysis_query31" method="POST">
 
-        <h3>Group A</h3>
-        <div id="input101">
-          <label for="dropdown101">移動平均:</label>
-          <select name="dropdown101" id="dropdown101" required>
-              <option value="{{window101}}">選択してください</option>
-              <option value="{{ma_value01}}" {% if ma_value01 == window101 %}selected{% endif %}>MA1:{{ma_value01}}days</option>
-              <option value="{{ma_value02}}" {% if ma_value02 == window101 %}selected{% endif %}>MA2:{{ma_value02}}days</option>
-              <option value="{{ma_value03}}" {% if ma_value03 == window101 %}selected{% endif %}>MA3:{{ma_value03}}days</option>
-              <option value="{{ma_value04}}" {% if ma_value04 == window101 %}selected{% endif %}>MA4:{{ma_value04}}days</option>
-              <option value="{{ma_value05}}" {% if ma_value05 == window101 %}selected{% endif %}>MA5:{{ma_value05}}days</option>
-          </select>
-        </div>
-        <div id="input102">
-          <p>Formula:{{comment102}}</p>
-        </div>
-
-        <div id="input111">
-          <label for="gap111"> {{daygapname111}}:</label>
-          <input type="number" style="width:50px" min="0" max="400" step="1" id="gap111"
-          name="gap111" value="{{ gapquery111 }}">
-        </div>
-
-        <div id="input121">
-          <label for="param121"> {{paramname121}}:</label>
-          <input type="number" style="width:50px" step="0.1" id="param121"
-          name="param121" value="{{paramquery121}}"><br>
-        </div>
-
-        <div id="input122">
-          <label for="param122"> {{paramname122}}:</label>
-          <input type="number" style="width:50px" step="0.1" id="param122"
-          name="param122" value="{{paramquery122}}"><br>
-        </div>
-
-        <div id="input123">
-          <p>{{subject123}}:{{comment123}}</p>
-        </div>
-        <div id="input124">
-          <p>{{subject124}}:{{comment124}}</p>
-        </div>
-        <div id="input125">
-          <p>{{subject125}}:{{comment125}}</p>
-        </div>
-
-        <div id="input131">
-          <h3>Operator</h3>
-            <label for="dropdown131">演算子:</label>
-            <select name="dropdown131" id="dropdown131" >
-              <option value="">選択してください</option>
-              {% for value, text in VALUE_MAP30.items() %}
-                <option value="{{ value }}" {% if value == ope_select131 %}selected{% endif %}>{{ text }}</option>
-              {% endfor %}
+          <h3>Group A</h3>
+          <div id="input101">
+            <label for="dropdown101">移動平均:</label>
+            <select name="dropdown101" id="dropdown101" required>
+                <option value="{{window101}}">選択してください</option>
+                <option value="{{ma_value01}}" {% if ma_value01 == window101 %}selected{% endif %}>MA1:{{ma_value01}}days</option>
+                <option value="{{ma_value02}}" {% if ma_value02 == window101 %}selected{% endif %}>MA2:{{ma_value02}}days</option>
+                <option value="{{ma_value03}}" {% if ma_value03 == window101 %}selected{% endif %}>MA3:{{ma_value03}}days</option>
+                <option value="{{ma_value04}}" {% if ma_value04 == window101 %}selected{% endif %}>MA4:{{ma_value04}}days</option>
+                <option value="{{ma_value05}}" {% if ma_value05 == window101 %}selected{% endif %}>MA5:{{ma_value05}}days</option>
             </select>
-        </div>
+          </div>
+          <div id="input102">
+            <p>Formula:{{comment102}}</p>
+          </div>
 
-        <h3>Group B</h3>
-        <div id="input201">
-          <label for="dropdown201">移動平均:</label>
-          <select name="dropdown201" id="dropdown201" required>
-              <option value="{{window101}}">選択してください</option>
-              <option value="{{ma_value01}}" {% if ma_value01 == window201 %}selected{% endif %}>MA1:{{ma_value01}}days</option>
-              <option value="{{ma_value02}}" {% if ma_value02 == window201 %}selected{% endif %}>MA2:{{ma_value02}}days</option>
-              <option value="{{ma_value03}}" {% if ma_value03 == window201 %}selected{% endif %}>MA3:{{ma_value03}}days</option>
-              <option value="{{ma_value04}}" {% if ma_value04 == window201 %}selected{% endif %}>MA4:{{ma_value04}}days</option>
-              <option value="{{ma_value05}}" {% if ma_value05 == window201 %}selected{% endif %}>MA5:{{ma_value05}}days</option>
+          <div id="input111">
+            <label for="gap111"> {{daygapname111}}:</label>
+            <input type="number" style="width:50px" min="0" max="400" step="1" id="gap111"
+            name="gap111" value="{{ gapquery111 }}">
+          </div>
+
+          <div id="input121">
+            <label for="param121"> {{paramname121}}:</label>
+            <input type="number" style="width:50px" step="0.1" id="param121"
+            name="param121" value="{{paramquery121}}"><br>
+          </div>
+
+          <div id="input122">
+            <label for="param122"> {{paramname122}}:</label>
+            <input type="number" style="width:50px" step="0.1" id="param122"
+            name="param122" value="{{paramquery122}}"><br>
+          </div>
+
+          <div id="input123">
+            <p>{{subject123}}:{{comment123}}</p>
+          </div>
+          <div id="input124">
+            <p>{{subject124}}:{{comment124}}</p>
+          </div>
+          <div id="input125">
+            <p>{{subject125}}:{{comment125}}</p>
+          </div>
+
+          <div id="input131">
+            <h3>Operator</h3>
+              <label for="dropdown131">演算子:</label>
+              <select name="dropdown131" id="dropdown131" >
+                <option value="">選択してください</option>
+                {% for value, text in VALUE_MAP30.items() %}
+                  <option value="{{ value }}" {% if value == ope_select131 %}selected{% endif %}>{{ text }}</option>
+                {% endfor %}
+              </select>
+          </div>
+
+          <h3>Group B</h3>
+          <div id="input201">
+            <label for="dropdown201">移動平均:</label>
+            <select name="dropdown201" id="dropdown201" required>
+                <option value="{{window101}}">選択してください</option>
+                <option value="{{ma_value01}}" {% if ma_value01 == window201 %}selected{% endif %}>MA1:{{ma_value01}}days</option>
+                <option value="{{ma_value02}}" {% if ma_value02 == window201 %}selected{% endif %}>MA2:{{ma_value02}}days</option>
+                <option value="{{ma_value03}}" {% if ma_value03 == window201 %}selected{% endif %}>MA3:{{ma_value03}}days</option>
+                <option value="{{ma_value04}}" {% if ma_value04 == window201 %}selected{% endif %}>MA4:{{ma_value04}}days</option>
+                <option value="{{ma_value05}}" {% if ma_value05 == window201 %}selected{% endif %}>MA5:{{ma_value05}}days</option>
+            </select>
+          </div>
+          <div id="input202">
+            <p>Formula:{{comment202}}</p>
+          </div>
+
+          <div id="input211">
+            <label for="gap211"> {{daygapname211}}:</label>
+            <input type="number" style="width:50px" min="0" max="400" step="1" id="gap211"
+            name="gap211" value="{{ gapquery211 }}">
+          </div>
+
+          <div id="input221">
+            <label for="param221"> {{paramname221}}:</label>
+            <input type="number" style="width:50px" step="0.1" id="param221"
+            name="param221" value="{{paramquery221}}"><br>
+          </div>
+
+          <div id="input222">
+            <label for="param222"> {{paramname222}}:</label>
+            <input type="number" style="width:50px" step="0.1" id="param122"
+            name="param222" value="{{paramquery222}}"><br>
+          </div>
+
+          <div id="input223">
+            <p>{{subject223}}:{{comment223}}</p>
+          </div>
+          <div id="input224">
+            <p>{{subject224}}:{{comment224}}</p>
+          </div>
+          <div id="input225">
+            <p>{{subject225}}:{{comment225}}</p>
+          </div>
+
+          <br>
+          <h3>Display Pannel</h3>
+          <label for="dropdown501">ソート順:</label>
+          <select name="dropdown501" id="dropdown501" >
+            <option value="">選択してください</option>
+            {% for value, text in VALUE_MAP40.items() %}
+              <option value="{{ value }}" {% if value == sort_select501 %}selected{% endif %}>{{ text }}</option>
+            {% endfor %}
           </select>
-        </div>
-        <div id="input202">
-          <p>Formula:{{comment202}}</p>
-        </div>
+          <div id="input502">
+            <p>Key Column: {{comment502}}</p>
+          </div>
+          <br>
 
-        <div id="input211">
-          <label for="gap211"> {{daygapname211}}:</label>
-          <input type="number" style="width:50px" min="0" max="400" step="1" id="gap211"
-          name="gap211" value="{{ gapquery211 }}">
-        </div>
+          <p id="noInput" class="hidden">入力項目はありません</p>
 
-        <div id="input221">
-          <label for="param221"> {{paramname221}}:</label>
-          <input type="number" style="width:50px" step="0.1" id="param221"
-          name="param221" value="{{paramquery221}}"><br>
-        </div>
+          <input type="submit" value="検索">
+        </form>
 
-        <div id="input222">
-          <label for="param222"> {{paramname222}}:</label>
-          <input type="number" style="width:50px" step="0.1" id="param122"
-          name="param222" value="{{paramquery222}}"><br>
-        </div>
-
-        <div id="input223">
-          <p>{{subject223}}:{{comment223}}</p>
-        </div>
-        <div id="input224">
-          <p>{{subject224}}:{{comment224}}</p>
-        </div>
-        <div id="input225">
-          <p>{{subject225}}:{{comment225}}</p>
-        </div>
-
-        <br>
-        <h3>Display Pannel</h3>
-        <label for="dropdown501">ソート順:</label>
-        <select name="dropdown501" id="dropdown501" >
-          <option value="">選択してください</option>
-          {% for value, text in VALUE_MAP40.items() %}
-            <option value="{{ value }}" {% if value == sort_select501 %}selected{% endif %}>{{ text }}</option>
-          {% endfor %}
-        </select>
-        <div id="input502">
-          <p>Key Column: {{comment502}}</p>
-        </div>
-        <br>
-
-        <p id="noInput" class="hidden">入力項目はありません</p>
-
-        <input type="submit" value="検索">
         <br><br>
         <div id="input511">
-          <h4>Save Option</h4>
-            <form action="/nkapp/analysis/analysis_query31" method="POST">
+          <div class="parent caret" onclick="toggleVisibility(this)">
+            <h4>Save Option:</h4>
+          </div>
+          <div class="child">
+            <form action="/nkapp/analysis/register_option" method="POST">
               <input type="checkbox" id="ckbox511" name="ckbox511" value="ckbox511"
               {% if ckbox511 %}checked{% endif %} >
               <label for="ckbox511">Active:</label>
@@ -225,16 +232,18 @@
               <label for="conf531">Config(.json):</label>
               <input type="text" id="conf531" name="conf531" value="{{conf531}}" style="flex: 1;text-align: left;">
               <br>
-              <div id="input541">
-                <p>{{subject541}}</p>
-                <p>{{comment541}}</p>
-              </div>
-            </form>
-            <br>
+              <input type="submit" value="登録">
+            </form><br>
             <form action="/nkapp/analysis/reset_option" method="POST">
               <input type="submit" value="Reset">
             </form>
           </div>
+          <div id="input541">
+            <p>{{subject541}}</p>
+            <p>{{comment541}}</p>
+          </div>
+          <br>
+        </div>
 
 
 
@@ -262,6 +271,11 @@
           <p>DATA_csv      :{{data521}}</p>
           <p>Config_json   :{{conf531}}</p>
 
+          <p>status     : {{status}}</p>
+          <p>comment    : {{comment}}</p>
+          <p>errormsg   : {{errormsg}}</p>
+          <p style="max-width: 300px; word-wrap: break-word;">file_path  : {{file_path}}</p>
+
           <br>
           <p>marketcode       :{{marketcode}}</p>
           <p>selected10       :{{selected10}}</p>
@@ -281,47 +295,47 @@
             input201: false, input211: false, input221: true, input222: false,
             input102: false, input123: false, input124: false, input125: false,
             input202: true, input223: false, input224: false, input225: false,
-            input502: true, input511: false},
+            input502: true, input511: true, input541: true},
           "0502": { input101: true, input111: true, input121: false, input122: false, input131:false,
             input201: true, input211: false, input221: false, input222: false,
             input102: false, input123: false, input124: false, input125: false,
             input202: false, input223: false, input224: false, input225: false,
-            input502: true, input511: false},
+            input502: true, input511: true, input541: true},
           "0503": { input101: true, input111: true, input121: false, input122: false, input131:false,
             input201: true, input211: false, input221: false, input222: false,
             input102: false, input123: false, input124: false, input125: false,
             input202: false, input223: false, input224: false, input225: false,
-            input502: true, input511: false},
+            input502: true, input511: true, input541: true},
           "0504": { input101: true, input111: true, input121: false, input122: false, input131:true,
             input201: false, input211: false, input221: false, input222: false,
             input102: false, input123: false, input124: false, input125: false,
             input202: true, input223: false, input224: false, input225: false,
-            input502: true, input511: false},
+            input502: true, input511: true, input541: true},
           "0511": { input101: false, input111: true, input121: false, input122: false, input131:true,
             input201: false, input211: false, input221: true, input222: false,
             input102: true, input123: false, input124: false, input125: false,
             input202: false, input223: false, input224: false, input225: false,
-            input502: true, input511: false},
+            input502: true, input511: true, input541: true},
           "0521": { input101: false, input111: false, input121: false, input122: false, input131:false,
             input201: false, input211: false, input221: false, input222: false,
             input102: true, input123: true, input124: false, input125: false,
             input202: false, input223: true, input224: false, input225: false,
-            input502: true, input511: false},
+            input502: true, input511: true, input541: true},
           "0523": { input101: false, input111: false, input121: false, input122: false, input131:true,
             input201: false, input211: false, input221: false, input222: false,
             input102: true, input123: true, input124: false, input125: false,
             input202: false, input223: true, input224: false, input225: false,
-            input502: true, input511: false},
+            input502: true, input511: true, input541: true},
           "0591": { input101: true, input111: true, input121: true, input122: true, input131:true,
             input201: true, input211: true, input221: true, input222: true,
             input102: true, input123: true, input124: true, input125: true,
             input202: true, input223: true, input224: true, input225: true,
-            input502: true, input511: true},
+            input502: true, input511: true, input541: true},
           "0592": { input101: false, input111: false, input121: false, input122: false, input131:false,
             input201: false, input211: false, input221: false, input222: false,
             input102: false, input123: false, input124: false, input125: false,
             input202: false, input223: false, input224: false, input225: false,
-            input502: false, input511: false},
+            input502: false, input511: false, input541: false},
           "0599": { input101: false, input111: false, input121: false, input122: false, input131:false,
             input201: false, input211: false, input221: false, input222: false,
             input102: true, input123: false, input124: false, input125: false,

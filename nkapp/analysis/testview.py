@@ -1,8 +1,140 @@
 """  nkapp.analysis.testview.py  """
-from flask import request, session
+import subprocess
+from tkinter import Tk, filedialog
+from flask import session
+# from flask import Flask, jsonify, render_template
+from flask import request, redirect, url_for
+import pandas as pd
 from .config import VALUE_MAP10, VALUE_MAP20, VALUE_MAP30
 from .config import VALUE_MAP40, VALUE_MAP41, VALUE_MAP50
 from .analysis20 import Ana
+
+class FSR:
+    """ファイル操作関連のクラス"""
+    @staticmethod
+    def run_file_selector():
+        """ファイル選択ダイアログをサブプロセスで実行"""
+        result = subprocess.run(
+            [
+                "c:/Users/Ichizo/OneDrive/ARM300/env/Scripts/python.exe",  # 仮想環境の Python を指定
+                "c:/Users/Ichizo/OneDrive/ARM300/nkapp/analysis/file_selector.py"  # フルパスで指定
+            ],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+
+        # result = subprocess.run(
+        #    ["python", "file_selector.py"],  # サブプロセスを実行
+        #    capture_output=True,
+        #    text=True,
+        #    check=True
+        #)
+        if result.returncode == 0:  # 正常終了
+            file_path = result.stdout.strip()
+            config_formula = Ana.load_config("ana_config.json")
+            config_formula.update({"file_path": file_path})
+            Ana.save_config("ana_config.json", config_formula)
+
+            return {"status": "success", "file_path": result.stdout.strip()}
+        else:  # エラー発生
+            return {"status": "error", "errormsg": result.stderr.strip()}
+
+    @staticmethod
+    def test_fileread2():
+        """指定されたファイルパスから内容を読み取る"""
+        file_path = None
+        ana_config = Ana.load_config("ana_config.json")
+        file_path = ana_config.get("file_path")
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                content = file.readlines()
+                print(content.head(10))
+                return {"status": "success", "file_path": file_path }  # 最初の10行を返す
+        except Exception as e:
+            return {"status": "error", "errormsg": str(e)}
+
+class FR:
+    """  Reading CSV file control """
+    @staticmethod
+    def reset_option_t():
+        """Reset Params for Save Option"""
+        if request.method == "POST":
+            # 既存の設定を読み込み
+            reset_config = {
+                "file_path": None,
+            }
+            # print(f"config_macd: {config_macd}")
+            config_data = Ana.load_config("ana_config.json")
+            config_data.update(reset_config)
+            Ana.save_config("ana_config.json",config_data)
+        else:
+            print("Reset Error/reset_option/57")
+        return redirect(url_for('analysis.test_select'))
+
+
+    @staticmethod
+    def select_file():
+        """  Reading CSV file with Windows """
+        file_path = None
+        ana_config = Ana.load_config("ana_config.json")
+        if request.method == "POST":
+            root = Tk()
+            root.withdraw()  # Tkinterウィンドウを非表示にする
+            try:
+                file_path = filedialog.askopenfilename(title="CSVファイルを選択してください", filetypes=[("CSVファイル", "*.csv")])
+                ana_config.update({"file_path": file_path})
+                Ana.save_config("ana_config.json", ana_config)
+                if file_path:
+                    print(file_path)
+                    params={"status": "success-selecting", "file_path": file_path}
+                else:
+                    print("ファイルが選択されませんでした。")
+                    params={
+                        "status": "notice",
+                        "errormsg": "ファイルが選択されませんでした。",
+                        "file_path": file_path
+                        }
+            except Exception as e:
+                params={
+                    "status": "error",
+                    "errormsg": str(e),
+                    "file_path": file_path
+                }
+            finally:
+                root.destroy()  # リソース解放を確実に行う
+        else:
+            file_path = ana_config.get("file_path")
+            params={"file_path": file_path}
+        return params
+
+
+    @staticmethod
+    def test_fileread():
+        """  Reading CSV file """
+        file_path = None
+        ana_config = Ana.load_config("ana_config.json")
+        file_path = ana_config.get("file_path")
+        if not file_path:
+            params={
+                "status": "notice",
+                "errormsg": "ファイルが選択されませんでした。",
+                "file_path": file_path
+            }
+            return params
+        try:
+            data = pd.read_csv(file_path)
+            print(data.head(10))
+            params={"status": "success-reading", "file_path": file_path}
+            return params
+        except Exception as e:
+            params={
+                "status": "error",
+                "errormsg": f"ファイルの読み込み中にエラーが発生しました: {e}",
+                "file_path": file_path
+            }
+
+            return params
 
 
 class Tst:
@@ -87,12 +219,12 @@ class Tst2:
 
         builder_params = {
             "condition": condition,
-            "value01": value01,
-            "value02": value02,
-            "value02a": value02a,
-            "value02b": value02b,
-            "value03": value03,
-            "value04": value04,
+            "value01"  : value01,
+            "value02"  : value02,
+            "value02a" : value02a,
+            "value02b" : value02b,
+            "value03"  : value03,
+            "value04"  : value04,
         }
         print(f"builder_params: {builder_params}")
 

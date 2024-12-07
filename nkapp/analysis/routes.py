@@ -7,18 +7,19 @@ from .analysis10 import Analysisparams10
 from .analysis20 import Marketparams, Formulaparams, Ana
 from .analysis30 import Analysisparams30
 from .analysis31 import A31
-from .testview import Tst2
+from .testview import Tst2, FR
 
 #  Blueprintのインスタンス作成
 bp_analysis = Blueprint("analysis", __name__, template_folder="templates")
 
 
-@bp_analysis.route("/builder", methods=['Get']) # Formula Setting
+@bp_analysis.route("/builder", methods=['Get','post']) # Formula Setting
 def builder():
     """  Routing for Treeview BBS  """
     main_params = Mainparams.get_main_params()
     config_builder = Ana.builder()
     return render_template('ana_builder.html', **main_params, **config_builder)
+
 
 @bp_analysis.route("/query_builder2", methods=["GET","POST"])
 def query_builder2():
@@ -36,6 +37,12 @@ def analysis_query31():
     builder_params = A31.query_builder2()
     main_params2 = A31.analysis_query31(builder_params)
     return render_template("ana_query31.html", **main_params, **main_params2)
+
+
+@bp_analysis.route("/register_option", methods=['Post'])
+def register_option():
+    """  Routing for Treeview BBS  """
+    return A31.register_option()
 
 
 @bp_analysis.route("/reset_option", methods=['Post'])
@@ -68,13 +75,47 @@ def reg_marketcode():
     return Marketparams.reg_marketcode()
 
 
+@bp_analysis.route("/select_csv", methods=["POST"])
+def select_csv():
+    """  Selecting CSV file """
+    return Marketparams.select_csv()
+
+
+@bp_analysis.route("/reset_csv", methods=['Post'])
+def reset_csv():
+    """  Routing for Treeview BBS  """
+    return Marketparams.reset_csv()
+
+
 @bp_analysis.route("/test_select", methods=["GET","POST"])
 def test_select():
     """  Routing for Treeview BBS  """
     print("Post_されました")
     config_builder = Tst2.test_select()
+    main_params = FR.select_file()
+    return render_template('test_select.html', **config_builder, **main_params)
 
-    return render_template('test_select.html', **config_builder)
+
+@bp_analysis.route("/select_file", methods=["POST"])
+def select_file():
+    """  Selecting CSV file """
+    config_builder = Tst2.test_select()
+    main_params = FR.select_file()
+    return render_template('test_select.html', **config_builder, **main_params)
+
+
+@bp_analysis.route("/test_fileread", methods=["POST"])
+def test_fileread():
+    """  Reading CSV file """
+    config_builder = Tst2.test_select()
+    main_params = FR.test_fileread()
+    return render_template('test_select.html', **config_builder, **main_params)
+
+
+@bp_analysis.route("/reset_option_t", methods=['Post'])
+def reset_option_t():
+    """  Routing for Treeview BBS  """
+    return FR.reset_option_t()
 
 
 @bp_analysis.route("/main")                      # Analysis メイン画面
