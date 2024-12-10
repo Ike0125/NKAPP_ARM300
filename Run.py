@@ -1,4 +1,4 @@
-"""   ARM200/Run.py   """
+"""   ARM300/Run.py   """
 from nkapp import create_nkapp
 
 # ロギング設定

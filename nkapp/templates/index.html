@@ -10,10 +10,13 @@
     <h1>NKsys Dashboard(ARM300)</h1>
     <h2>/index</h2>
     <h3>Current Links</h3>
+    <ul>
+        <li><a href="{{ url_for('api.api_main') }}">APIs</a></li>
         <li><a href="{{ url_for('analysis.builder') }}">Analysis Builder</a></li>
         <li><a href="{{ url_for('analysis.analysis_query31') }}">query31</a></li>
         <li><a href="{{ url_for('rpt.main') }}">Reports</a></li>
-
+        <li><a href="{{ url_for('.setting') }}">Setting</a></li>
+    </ul>
 
     <h3>Old Links</h3>
     <ul>

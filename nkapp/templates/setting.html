@@ -10,6 +10,10 @@
     <h1>設定管理画面</h1>
     <h2>/setting</h2>
     <p>ここでは、システムの設定をコントロール画面を入れる予定です。</p>
+    <ul>
+        <li><a href="{{ url_for('set.main') }}">Setting Main</a></li>
+        <li><a href="{{ url_for('set.daily_printout') }}">Daily Print</a></li>
+    </ul>
     <a href="{{ url_for('.index') }}">メインメニューに戻る</a>
 </body>
 </html>

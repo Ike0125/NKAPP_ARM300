@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J-Quants Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>J-QuantsManagement</h1>
+    <h2>api/jq_main</h2>
+
+    <!-- Token Management Section -->
+    <br>
+    <h3>Token Management</h3>
+
+    <!-- ID Token Section -->
+    <p>ID Token: Last Updated: {{ id_token_timestamp }} (24-hour validity)</p>
+    <form action="{{ url_for('api.token_action') }}" method="post">
+        <button type="submit">Update</button>
+    </form>
+
+    <!-- Status and Message Section -->
+    <p>Status: {{ status_code }} - {{ status_message }}</p>
+
+    <!-- Refresh Token Section -->
+    <p>Refresh Token: Last Updated: {{ refresh_token_timestamp }} (7-day validity)</p>
+    <form action="{{ url_for('api.refresh_token_action') }}" method="post">
+        <input type="text" name="refresh_token" placeholder="Paste your refresh token here" autocomplete="off" required>
+        <button type="submit">Save</button>
+    </form>
+
+    <!--Listed Information -->
+    <h3>Listed Information</h3>
+    <p>DB: Last Updated: {{ last_update_info }} ; {{ record_count_info }} records </p>
+    <form action="{{ url_for('api.listedinfo_action') }}" method="post">
+        <label for="date">Date:</label>
+        <input type="text" id="date" name="date" value={{ last_update_info }}  required>
+        <button type="submit">Update</button>
+    </form>
+    <!-- Selective Data Retrieval Section -->
+    <h3>Selective Stock Data Retrieval</h3>
+    <p>DB: Last Updated: {{ last_update }} ; {{ record_count }} records </p>
+    <form action="{{ url_for('api.kabudb_action') }}" method="post">
+        <label for="code">Stock Code:</label>
+        <input type="text" id="code" name="code" value="7203" required>
+        <button type="submit">submit</button>
+    </form>
+
+    <!-- All Data Retrieval Section -->
+    <h3>All Sock Data Retrieval</h3>
+    <p>DB: Last Updated: {{ last_update_all }} ; {{ record_count_all }} records </p>
+    <form action="{{ url_for('api.kabudball_action') }}" method="post">
+        <button type="submit">submit</button>
+    </form>
+
+    <p>今後、他のDB追加予定</p>
+    <a href="{{ url_for('nkapp.api') }}">DB管理画面に戻る</a><br>
+    <a href="{{ url_for('nkapp.index') }}">メインメニューに戻る</a>
+</body>
+</html>

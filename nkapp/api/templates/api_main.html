@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APIs</title>
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/base.css') }}"
+  />
+  <script src="/static/js/treeview.js"></script>
+</head>
+<body>
+  <div class="sidebar">
+    <ul>
+      <br><br>
+      <li><a href={{ url_for('analysis.analysis_query31') }}>Analysis31</a></li>
+      <li><a href="{{ url_for('rpt.main') }}">Reports</a></li>
+      <li><a href={{ url_for('api.api_main') }}>APIs</a></li>
+      <li><a href={{ url_for('analysis.builder') }}>Parameters</a></li>
+      <li><a href="http://localhost:8888/lab">Jupyter Lab</a></li>
+      <br><br><br>
+      <a href="{{ url_for(return_url) }}"> {{return_name}} </a>
+      <br><br>
+      <a href="{{ url_for(home_url) }}"> Home </a>
+      <br><br>
+      <h5>{{ current_db }}</h5><br>
+      <h4>Table1: listed_info</h4>
+        <p>Last Updated:</p>
+        <p>{{ last_update_info }} ; {{ record_count_info }}records</p>
+      <br>
+      <h4>Table2: Daily_Quotes_All</h4>
+      <p>Last Updated:</p><br>
+      <p>{{ last_update_all }} ; {{ record_count_all }}records</p>
+      <br><br><br><br><br><br><br><br>
+    </ul>
+  </div>
+  <div class="main-content">
+    <header>
+      <h1>APIs</h1>
+    </header>
+    <h2>API Managements</h1>
+    <br>
+    <section>
+      <div class="parent caret" onclick="toggleVisibility(this)">
+        <h3>J_Quonts</h3>
+      </div>
+      <div class="child">
+        <h3>Token Management</h3>
+
+        <!-- ID Token Section -->
+        <p>ID Token: Last Updated: {{ id_token_timestamp }} (24-hour validity)</p>
+        <form action="{{ url_for('api.token_action') }}" method="post">
+            <button type="submit">Update</button>
+        </form>
+
+        <!-- Status and Message Section -->
+        <p>Status: {{ status_code }} - {{ status_message }}</p>
+
+        <!-- Refresh Token Section -->
+        <p>Refresh Token: Last Updated: {{ refresh_token_timestamp }} (7-day validity)</p>
+        <form action="{{ url_for('api.refresh_token_action') }}" method="post">
+            <input type="text" name="refresh_token" placeholder="Paste your refresh token here" autocomplete="off" required>
+            <button type="submit">Save</button>
+        </form>
+        <!--Listed Information -->
+        <h3>Listed Information</h3>
+        <p>DB: Last Updated: {{ last_update_info }} ; {{ record_count_info }} records </p>
+        <form action="{{ url_for('api.listedinfo_action') }}" method="post">
+            <label for="date">Date:</label>
+            <input type="text" id="date" name="date" value={{ last_update_info }}  required>
+            <button type="submit">Update</button>
+        </form>
+        <!-- Selective Data Retrieval Section -->
+        <h3>Selective Stock Data Retrieval</h3>
+        <p>DB: Last Updated: {{ last_update }} ; {{ record_count }} records </p>
+        <form action="{{ url_for('api.kabudb_action') }}" method="post">
+            <label for="code">Stock Code:</label>
+            <input type="text" id="code" name="code" value="7203" required>
+            <button type="submit">submit</button>
+        </form>
+        <!-- All Data Retrieval Section -->
+        <h3>All Sock Data Retrieval</h3>
+        <p>DB: Last Updated: {{ last_update_all }} ; {{ record_count_all }} records </p>
+        <form action="{{ url_for('api.kabudball_action') }}" method="post">
+            <button type="submit">submit</button>
+        </form>
+        <br>
+      </div>
+        <a href="{{ url_for('nkapp.api') }}">DB管理画面に戻る</a><br>
+        <a href="{{ url_for('nkapp.index') }}">メインメニューに戻る</a>
+
+        <div class="parent caret">
+          <h4>Nikkei:</h4>
+        </div>
+        <div class="child">
+          <p>Under Construction</p>
+        </div>
+        <div class="parent caret" >
+          <h4>DOW/NASDAC/SP500:</h4>
+        </div>
+        <div class="child">
+          <p>Under Construction</p>
+        </div>
+        <div class="parent caret" >
+          <h4>Currency:</h4>
+        </div>
+        <div class="child">
+          <p>Under Construction</p>
+        </div>
+      </section>
+  </div>
+  <footer>
+    <p>api_main</p>
+    <p>© 2024 SWFSOMA013 All Rights Reserved.</p>
+    <p>{{ current_time }}</p>
+  </footer>
+</body>
+</html>

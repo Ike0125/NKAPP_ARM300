@@ -6,7 +6,7 @@ import json
 import pandas as pd
 from sqlalchemy import func
 from sqlalchemy.engine.row import Row
-from flask import session
+# from flask import session
 from flask import render_template
 from .models import Session, Tl
 from .analysis.analysis20 import Ana
@@ -54,7 +54,7 @@ class Mainparams:
             "current_time": current_time,
             "current_db": current_db,
         }
-        # print(record_count_all)
+
         return main_params
 
 

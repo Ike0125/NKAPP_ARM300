@@ -1,6 +1,7 @@
 """ models.py """
-from sqlalchemy import Column, Float, Date, create_engine,Sequence
+from sqlalchemy import Column, Float, Date
 from sqlalchemy import Table, Index, Integer, String, MetaData
+from sqlalchemy import create_engine, Sequence, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, aliased
 
@@ -65,6 +66,9 @@ class DailyQuotes(Base):
     adjustmentclose = Column(Float, nullable=True, default=0.0)
     adjustmentvolume = Column(Float, nullable=True, default=0.0)
 
+    __table_args__ = (
+        UniqueConstraint('date', 'code', name='unique_date_code'),
+    )
 class DailyQuotesAll(Base):
     """株価4本値テーブルの定義（一括）"""
 
