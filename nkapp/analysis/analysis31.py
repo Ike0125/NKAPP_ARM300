@@ -506,7 +506,7 @@ class A31:
         with Session() as session:
             # 取引カレンダーから最新の取引日を取得
             last_trade_date = session.query(
-                func.max(Tl.daily_table.c.date)
+                func.max(Tl.daily_all_table.c.date)
             ).scalar()
 
             # 取引日番号を使って取引日を計算
@@ -551,6 +551,7 @@ class A31:
                     print(f"Error Message: {errormsg}")
                     custom_code = df_custom_data["code"].astype(str).tolist()  # 数値を文字列に変換
                     marketcode_condition = Tl.company.code.in_(custom_code)  # SQLAlchemyのin_演算子を使用
+                    print(f"custom_code: {custom_code}")
                 else:
                     params={
                         status   : "Notice",
@@ -581,6 +582,10 @@ class A31:
                 .order_by(A31.get_sort_order(
                     ana_sort, getattr(Tl.company, key_column)))
             )
+        print(f"marketcode_condition: {marketcode_condition}")
+        basequery_data = session.execute(base_query).fetchall()
+        print(f"base_query rows: {len(basequery_data)}")
+
         # print(f"base_query: {base_query}")
         return base_query
 
@@ -603,7 +608,7 @@ class A31:
         with Session() as session:
             # 最新の取引日を取得
             last_trade_date = session.query(
-                func.max(Tl.t_calendar.c.tradingdate)
+                func.max(Tl.daily_all_table.c.date)
             ).scalar()
 
             # 取引日番号を計算
@@ -840,7 +845,7 @@ class A31:
         ana_param32 = float(ana_config.get("paramquery221"))
         key_column = "deviation_rate"
         with Session() as session:
-            last_trade_date = session.query(func.max(Tl.daily_table.c.date)).scalar()
+            last_trade_date = session.query(func.max(Tl.daily_all_table.c.date)).scalar()
 
             t_date = last_trade_date
             end_day_no = TD.date_tno(t_date) - day_gap
@@ -1026,7 +1031,7 @@ class A31:
         ana_param32 = float(ana_config.get("paramquery221"))
 
         with Session() as session:
-            last_trade_date = session.query(func.max(Tl.daily_table.c.date)).scalar()
+            last_trade_date = session.query(func.max(Tl.daily_all_table.c.date)).scalar()
             end_day_no = TD.date_tno(last_trade_date) - day_gap
             end_day = TD.tno_tdate(end_day_no)
             start_day_no = end_day_no-(window *2)
@@ -1145,7 +1150,7 @@ class A31:
         day_gap = int(ana_config.get("gapquery111", 0))  # 日付のギャップ
         with Session() as session:
             # 取引カレンダーを使って取引日を計算する
-            last_trade_date = session.query(func.max(Tl.daily_table.c.date)).scalar()
+            last_trade_date = session.query(func.max(Tl.daily_all_table.c.date)).scalar()
             end_day_no = TD.date_tno(last_trade_date) - day_gap
             end_day = TD.tno_tdate(end_day_no)
             start_day_no = end_day_no-(long_window *2)
@@ -1308,7 +1313,7 @@ class A31:
         with Session() as session:
             # 取引カレンダーから最新の取引日を取得
             last_trade_date = session.query(
-                func.max(Tl.t_calendar.c.tradingdate)
+                func.max(Tl.daily_all_table.c.date)
             ).scalar()
 
             # 取引日番号を使って取引日を計算
@@ -1332,11 +1337,11 @@ class A31:
                 Tl.t_calendar.c.tradingdate
             ).filter(Tl.t_calendar.c.trade_date_no == start_day_no).scalar()
 
-            # print(f"last_trade_date : {last_trade_date}")
-            # print(f"end_day_A       : {end_day_A}")
-            # print(f"end_day_B       : {end_day_B}")
-            # print(f"start_day       : {start_day}")
-            # print(f"window          : {window}")
+            print(f"last_trade_date : {last_trade_date}")
+            print(f"end_day_A       : {end_day_A}")
+            print(f"end_day_B       : {end_day_B}")
+            print(f"start_day       : {start_day}")
+            print(f"window          : {window}")
 
             subquery = A31.ana_query_mkt().subquery()
             aliased_subquery = aliased(subquery)

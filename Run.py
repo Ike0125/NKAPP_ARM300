@@ -18,4 +18,4 @@ from nkapp import create_nkapp
 nkapp = create_nkapp()
 if __name__ == "__main__":
     nkapp.run(debug=True)
-    #  debug mode:True, normal mode:false
+    #  debug mode:True, normal mode:False

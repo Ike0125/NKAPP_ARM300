@@ -1,4 +1,5 @@
 """  __init__.py  """
+from datetime import timedelta
 from flask import Flask
 from .routes import bp_nkapp        # nkappのblueprint
 from .rpt.routes import bp_rpt      # reportのblueprint
@@ -13,11 +14,15 @@ from .set.routes import bp_set      # setのblueprint
 def create_nkapp():
     """  nkapp initialization  """
     nkapp = Flask(__name__)
-    nkapp.secret_key = 'arm200_secret_key'  #dropdownlist用
-    # create_books_table()
-    # テスト用DB,book作成
+    # セッション用の秘密鍵を設定
+    nkapp.secret_key = 'arm300_secret_key'  #dropdownlist用
+    # セッションの永続性を有効化
+    nkapp.config['SESSION_PERMANENT'] = True
+    # セッションの有効期限を1週間に設定
+    nkapp.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+
+    # テーブル作成
     # create_sql_table()
-    # SQL_DB用接続、作成
     # Blueprint registration
     nkapp.register_blueprint(bp_nkapp, url_prefix='/nkapp')               # Main
     nkapp.register_blueprint(bp_rpt, url_prefix='/nkapp/rpt')             # Report

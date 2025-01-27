@@ -12,9 +12,12 @@ from .models import Session, Tl
 from .analysis.analysis20 import Ana
 
 
+class SECPARAMS:
+    """各掲示板の共通初期設定値"""
+    seckey_database = "nkapp0513"  # for Database Management
+
 class Mainparams:
     """Get SQL_DB Parameters"""
-
     @staticmethod
     def get_current_time():
         """現在の日時取得"""
@@ -31,28 +34,58 @@ class Mainparams:
                 # daily_quotes総レコード数
                 record_count_all = f"{session.query(Tl.daily_all_table).count():,}"
                 # daily_quotes_all総レコード数
+                record_count_jqcalendar = f"{session.query(Tl.jqcalendar).count():,}"
+                # jqcalendar総レコード数
+                record_count_statements = f"{session.query(Tl.statements_table).count():,}"
+                # statements総レコード数
+                record_count_announcement = f"{session.query(Tl.announcement_table).count():,}"
+                # annoucement総レコード数
                 last_update_info = session.query(
                     func.max(Tl.info_table.c.date)
                 ).scalar()  # listed_info 最終更新日
+                # jq_calendar 総レコード数
                 last_update = session.query(
                     func.max(Tl.daily_table.c.date)
                 ).scalar()  # daily_quotes最終更新日
                 last_update_all = session.query(
                     func.max(Tl.daily_all_table.c.date)
                 ).scalar()  # daily_quotes最終更新日
+                last_update_jqcalendar = session.query(
+                    func.max(Tl.jq_calendar.c.date)
+                ).scalar()  # jq_calendar最終更新日
+                start_daily = session.query(
+                    func.min(Tl.daily_table.c.date)
+                ).scalar()  # daily_quotesスタート
+                start_daily_all = session.query(
+                    func.min(Tl.daily_all_table.c.date)
+                ).scalar()  # daily_quotesスタート
+                last_update_statements = session.query(
+                    func.max(Tl.statements_table.c.DisclosedDate)
+                ).scalar()  # statements最終更新日
+                start_statements = session.query(
+                    func.min(Tl.statements_table.c.DisclosedDate)
+                ).scalar()  # daily_quotesスタート
         current_time = Mainparams.get_current_time()
         db = Tl.current_db
         at_db = db.find('@')
         current_db = db[at_db:]
         main_params = {
-            "record_count_info": record_count_info,
-            "record_count": record_count,
-            "record_count_all": record_count_all,
-            "last_update_info": last_update_info,
-            "last_update": last_update,
-            "last_update_all": last_update_all,
-            "current_time": current_time,
-            "current_db": current_db,
+            "record_count_info" : record_count_info,
+            "record_count"      : record_count,
+            "record_count_all"  : record_count_all,
+            "record_count_jqcalendar": record_count_jqcalendar,
+            "record_count_statements": record_count_statements,
+            "record_count_announcement": record_count_announcement,
+            "last_update_info"  : last_update_info,
+            "last_update"       : last_update,
+            "last_update_all"   : last_update_all,
+            "last_update_jqcalendar": last_update_jqcalendar,
+            "last_update_statements": last_update_statements,
+            "current_time"      : current_time,
+            "current_db"        : current_db,
+            "start_daily"       : start_daily,
+            "start_daily_all"   : start_daily_all,
+            "start_statements"  : start_statements,
         }
 
         return main_params
@@ -264,3 +297,20 @@ class Fileparams:
                 "errormsg" : f"設定ファイルの保存中にエラーが発生しました: {e}",
                 "message" : ""
             }
+
+
+    @staticmethod
+    def load_config(file_name):
+        """指定されたJSONファイルから設定を読み込み"""
+        save_dir = r"C:\Users\Ichizo\OneDrive\ARM300\data\saved_data"
+        # 拡張子が .json でない場合、自動的に追加
+        if not file_name.endswith(".json"):
+            file_name += ".json"
+        file_path = os.path.join(save_dir, file_name)
+        # file_path = os.path.join(os.path.dirname(__file__), file_name)
+        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+            with open(file_path, "r", encoding="utf-8") as file:
+                return json.load(file)
+        else:
+            return {}  # ファイルが存在しない場合、空の辞書を返す
+

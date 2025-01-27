@@ -236,11 +236,6 @@ class Marketparams:
             selected12 = VALUE_MAP12.get(sector33code,"")
             selected13 = VALUE_MAP13.get(scalecategory,"")
             selected14 = VALUE_MAP14.get(customcategory,"")
-            # selected10 = selected10[1]
-            # selected11 = selected11[1]
-            # selected12 = selected12[1]
-            # selected13 = selected13[1]
-            # selected14 = selected14[1]
 
             if ckbox10_selected is True :
                 marketcategory = "Market Code"

@@ -1,65 +1,17 @@
 """ kabudb.py J-QuantsとのAPIプログラム """
 from datetime import datetime
 from time import time
-from flask import flash, request
+from flask import flash, redirect, url_for, request
 import requests
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 from nkapp.models import DailyQuotes, engine
 from nkapp.api.config import Config
 from nkapp.api.api_main import AP
-from nkapp.set.mockjq_main import MK
-
-
-# モックデータを定義（プログラムの冒頭に記載）
-MOCK_API_RESPONSE = {
-    "daily_quotes": [
-        {
-            "Date": "2024-06-19",
-            "Code": "13010",
-            "Open": 3860.0,
-            "High": 3865.0,
-            "Low": 3820.0,
-            "Close": 3865.0,
-            "UpperLimit": 0,
-            "LowerLimit": 0,
-            "Volume": 42900.0,
-            "TurnoverValue": 165224000.0,
-            "AdjustmentFactor": 1.0,
-            "AdjustmentOpen": 3860.0,
-            "AdjustmentHigh": 3865.0,
-            "AdjustmentLow": 3820.0,
-            "AdjustmentClose": 3865.0,
-            "AdjustmentVolume": 42900.0,
-        }
-    ]
-}
-
-
-# モック関数を定義
-def mock_requests_get(url, headers=None, params=None, timeout=None):
-    """ mock_test for kabudb.py """
-    class MockResponse:
-        """ mock response """
-        def __init__(self, json_data, status_code):
-            self.json_data = json_data
-            self.status_code = status_code
-
-        def json(self):
-            """ mock response """
-            return self.json_data
-    # 引数を無視する場合
-    _ = url
-    _ = headers
-    _ = params
-    _ = timeout
-
-    # モックデータを返す
-    return MockResponse(MOCK_API_RESPONSE, 200)
 
 
 @staticmethod
-def retrieve_kabudb_request(mode=1):
+def retrieve_kabudb_request():
     """
     JQ APIから株価データを取得し、データベースに保存または更新する。
     """
@@ -73,22 +25,12 @@ def retrieve_kabudb_request(mode=1):
     # ユーザーが入力したコードを取得
     code = request.form.get("code", "72030")  # デフォルト値は '72030'
 
+    # APIリクエスト
     params = {"code": code}
+    response = requests.get(
+        Config.JQ_Daily_URL, headers=headers, params=params, timeout=10
+    )
 
-    if mode == 9:    # mock test
-        # APIリクエスト(モックテスト)
-        response = MK.mock_jquants_api(
-            Config.JQ_Daily_URL, headers=headers, params=params, timeout=10
-        )
-        print(f"response:{response.json()}")
-    elif mode == 1:
-        # APIリクエスト
-        response = requests.get(
-            Config.JQ_Daily_URL, headers=headers, params=params, timeout=10
-        )
-    else:
-        print("Modeが設定されていません")
-        raise ValueError("mode isn't set.")
     try:
         if response.status_code == 200:
             data = response.json()
@@ -142,14 +84,12 @@ def retrieve_kabudb_request(mode=1):
                         )
                         session.execute(stmt)
                 session.commit()
-            flash(f"{response.status_code}:Updated. ", "success")
+            flash("データの取得と保存に成功しました", "success")
         else:
-            message =response.json().get('message')
-            flash(f"{response.status_code}:{message}", "error")
-    except ValueError as e:
-        flash(f"{str(e)}","error")
+            flash(f"データの取得に失敗しました: {response.status_code}", "error")
     except Exception as e:
         flash(f"エラーが発生しました: {str(e)}", "error")
+        raise
     print(f"Total process time: {time() - start_time:.2f} seconds")
 
-    return
+    return redirect(url_for("api.api_main"))

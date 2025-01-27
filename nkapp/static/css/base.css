@@ -218,3 +218,11 @@ td {
 td:first-child {
   width: 30%;  /* ラベル部分の幅を固定 */
 }
+
+.success {
+  color: green;
+  font-weight: bold;
+}
+.error {
+  color: red;
+}

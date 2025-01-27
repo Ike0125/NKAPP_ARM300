@@ -18,6 +18,15 @@ class Config:
     JQ_Listed_URL = os.getenv(
         "JQ_Listed_URL", "https://api.jquants.com/v1/listed/info"
     )  # listed/info　との接続先
+    JQ_Calendar_URL = os.getenv(
+        "JQ_Calendar_URL", "https://api.jquants.com/v1/markets/trading_calendar"
+    )  # markets/trading_calendar　との接続先
+    JQ_Statements_URL = os.getenv(
+        "JQ_Statements_URL", "https://api.jquants.com/v1/fins/statements"
+    )  # fins/statements　との接続先
+    JQ_Announcement_URL = os.getenv(
+        "JQ_Announcement_URL", "https://api.jquants.com/v1/fins/announcement"
+    )  # fins/annoucement　との接続先
 
     """SQL DBとの接続先"""
     SQL_DataBase1 = DATABASE1   # J-Quontesから取得したDB

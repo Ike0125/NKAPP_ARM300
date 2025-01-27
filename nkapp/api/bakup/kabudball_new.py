@@ -15,11 +15,11 @@ from nkapp.api.api_main import AP
 from nkapp.set.mockjq_main import MK
 
 
-class JQDB:
+class JQDB2:
     """Updating Trading Calendar"""
 
     @staticmethod
-    def retrieve_kabudball_request(mode=1):
+    def retrieve_kabudball_request_update(mode=1):
         """
         JQ APIから全銘柄の株価データを取得し、データベースに新しいデータを追加する。
         """
@@ -84,14 +84,14 @@ class JQDB:
                         for item in data["daily_quotes"]:
                             date_obj = datetime.strptime(item["Date"], "%Y-%m-%d").date()
                             # 新しいデータのみ追加
-                            existing_data_stmt = select(DailyQuotesAll).where(
-                                (DailyQuotesAll.code == item["Code"]) &
-                                (DailyQuotesAll.date == date_obj)
+                            existing_data_stmt = select(DailyQuotes).where(
+                                (DailyQuotes.code == item["Code"]) &
+                                (DailyQuotes.date == date_obj)
                             )
                             existing_data = session.execute(existing_data_stmt).first()
 
                             if not existing_data:
-                                new_quotes.append(DailyQuotesAll(
+                                new_quotes.append(DailyQuotes(
                                     date=date_obj,
                                     code=item["Code"],
                                     open=item["Open"],
@@ -109,8 +109,8 @@ class JQDB:
                                     adjustmentclose=item["AdjustmentClose"],
                                     adjustmentvolume=item["AdjustmentVolume"],)
                                 )
-                                #session.add(new_quote)
-                        #session.commit()  # データを確定
+                                session.add_all(new_quotes)
+                        session.commit()  # データを確定
                     elif mode == 9:
                         for item in data["daily_quotes"]:
                             date_obj = datetime.strptime(item["Date"], "%Y-%m-%d").date()
@@ -140,24 +140,24 @@ class JQDB:
                                     adjustmentclose=item["AdjustmentClose"],
                                     adjustmentvolume=item["AdjustmentVolume"],)
                                 )
-                                # session.add(new_quote)
-                        # session.commit()  # データを確定
+                                session.add_all(new_quotes)
+                        session.commit()  # データを確定
                 else:
                     flash(f"{code}のデータ取得に失敗しました: {response.status_code}", "error")
-
+                    session.rollback()
                 # APIのリクエスト制限を考慮して少し待機
                 sleep(0.2)  # 必要に応じて調整
                 print(f"Processing time for code {code}: {time() - step_start:.2f} seconds")
 
             # **変更箇所：一括でデータベースに保存**
-            try:
-                session.add_all(new_quotes)
-                session.commit()
-                print("All data committed successfully.")
-            except SQLAlchemyError as e:
-                print(f"Error committing data: {e}")
-                flash("データベースへの保存中にエラーが発生しました", "error")
-                session.rollback()
+            #try:
+            #    session.add_all(new_quotes)
+            #    session.commit()
+            #    print("All data committed successfully.")
+            #except SQLAlchemyError as e:
+            #    print(f"Error committing data: {e}")
+            #    flash("データベースへの保存中にエラーが発生しました", "error")
+            #    session.rollback()
         print(f"Total process time: {time() - start_time:.2f} seconds")
         flash("すべての銘柄のデータ取得と保存に成功しました", "success")
         # return redirect(url_for("api.api_main"))
@@ -202,7 +202,7 @@ class JQDB:
                 if t_date is None:
                     # TradingCalendar が空の場合、初期データを挿入
                     flash("TradingCalendar is empty. Rebuilding with initial data.", "message")
-                    JQDB._initialize_trading_calendar(session, daily, d_date)
+                    JQDB2._initialize_trading_calendar(session, daily, d_date)
                     return
 
                 # 更新が必要か確認

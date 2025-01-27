@@ -18,6 +18,7 @@
       <li><a href="{{ url_for('rpt.main') }}">Reports</a></li>
       <li><a href={{ url_for('api.api_main') }}>APIs</a></li>
       <li><a href={{ url_for('analysis.builder') }}>Parameters</a></li>
+      <li><a href={{ url_for('set.main') }}>System Setting</a></li>
       <li><a href="http://localhost:8888/lab">Jupyter Lab</a></li>
       <br><br><br>
       <a href="{{ url_for(return_url) }}"> {{return_name}} </a>
@@ -41,6 +42,15 @@
     </header>
     <h2>API Managements</h1>
     <br>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
     <section>
       <div class="parent caret" onclick="toggleVisibility(this)">
         <h3>J_Quonts</h3>
@@ -49,16 +59,13 @@
         <h3>Token Management</h3>
 
         <!-- ID Token Section -->
-        <p>ID Token: Last Updated: {{ id_token_timestamp }} (24-hour validity)</p>
+        <p>ID Token: Last Updated: {{ id_token_timestamp }} (24-hour)</p>
         <form action="{{ url_for('api.token_action') }}" method="post">
             <button type="submit">Update</button>
         </form>
 
-        <!-- Status and Message Section -->
-        <p>Status: {{ status_code }} - {{ status_message }}</p>
-
         <!-- Refresh Token Section -->
-        <p>Refresh Token: Last Updated: {{ refresh_token_timestamp }} (7-day validity)</p>
+        <p>Refresh Token: Last Updated: {{ refresh_token_timestamp }} (7-day)</p>
         <form action="{{ url_for('api.refresh_token_action') }}" method="post">
             <input type="text" name="refresh_token" placeholder="Paste your refresh token here" autocomplete="off" required>
             <button type="submit">Save</button>
@@ -68,7 +75,7 @@
         <p>DB: Last Updated: {{ last_update_info }} ; {{ record_count_info }} records </p>
         <form action="{{ url_for('api.listedinfo_action') }}" method="post">
             <label for="date">Date:</label>
-            <input type="text" id="date" name="date" value={{ last_update_info }}  required>
+            <input type="text" id="date" name="date" value={{ next_update_info }}  required>
             <button type="submit">Update</button>
         </form>
         <!-- Selective Data Retrieval Section -->
@@ -76,38 +83,88 @@
         <p>DB: Last Updated: {{ last_update }} ; {{ record_count }} records </p>
         <form action="{{ url_for('api.kabudb_action') }}" method="post">
             <label for="code">Stock Code:</label>
-            <input type="text" id="code" name="code" value="7203" required>
+            <input type="text" id="code" name="code" value="72030" required>
             <button type="submit">submit</button>
         </form>
         <!-- All Data Retrieval Section -->
         <h3>All Sock Data Retrieval</h3>
         <p>DB: Last Updated: {{ last_update_all }} ; {{ record_count_all }} records </p>
-        <form action="{{ url_for('api.kabudball_action') }}" method="post">
-            <button type="submit">submit</button>
+        <form action="{{ url_for('api.kabudball_update_date') }}" method="post">
+          <label for="date1">Date-1:</label>
+          <input type="text" id="date1" name="date1" value= {{date1_value}} required><br>
+          <label for="date2">Date-2:</label>
+          <input type="text" id="date2" name="date2" value= {{date2_value}} required>
+          <button type="submit">update by date</button>
         </form>
+        <div class="parent caret">
+          <h4>Options</h4>
+        </div>
+        <div class="child">
+          <p>DB: Last Updated: {{ last_update_all }} ; {{ record_count_all }} records </p>
+          <h5>Original w/check</h5>
+          <form action="{{ url_for('api.kabudball_action') }}" method="post">
+              <button type="submit">update</button>
+          </form>
+          <h5>New</h5>
+          <form action="{{ url_for('api.kabudball_action_new') }}" method="post">
+            <button type="submit">new</button>
+          </form>
+          <h5>Update w/check</h5>
+          <form action="{{ url_for('api.kabudball_update') }}" method="post">
+            <button type="submit">update</button>
+          </form>
+        </div>
+        <br>
+        <!-- Statements Section -->
+        <h3>Statements Information</h3>
+        <p>DB: Last Updated: {{ last_update_statements }} ; {{ record_count_statements }} records </p>
+        <form action="{{ url_for('api.get_statements') }}" method="post">
+          <label for="st_date1">Date-1:</label>
+          <input type="text" id="st_date1" name="st_date1" value= {{st_date1_value}} required><br>
+          <label for="st_date2">Date-2:</label>
+          <input type="text" id="st_date2" name="st_date2" value= {{st_date2_value}} required>
+          <button type="submit">update</button>
+        </form>
+
+        <h3>JqTradingCalendar Data</h3>
+        <p>DB: Last Updated: {{ last_update_jqcalendar}} ; {{record_count_jqcalendar}} records </p>
+        <form action="{{ url_for('api.jqcalendar_update') }}" method="post">
+          <label for="jqcd1">Date-1:</label>
+          <input type="text" id="jqcd1" name="jqcd1" value= {{jqcd1_value}}><br>
+          <label for="jqcd2">Date-2:</label>
+          <input type="text" id="jqcd2" name="jqcd2" value= {{jqcd2_value}}>
+          <button type="submit">update</button>
+        </form>
+
+        <h3>JQAnnoucement Calendar</h3>
+        <p>DB: Last Updated: {{ announcement_timestamp }} ; {{ record_count_announcement }} records </p>
+        <form action="{{ url_for('api.get_announcement') }}" method="post">
+          <button type="submit">update</button>
+        </form>
+
         <br>
       </div>
-        <a href="{{ url_for('nkapp.api') }}">DB管理画面に戻る</a><br>
-        <a href="{{ url_for('nkapp.index') }}">メインメニューに戻る</a>
+      <div class="parent caret">
+        <h4>Nikkei:</h4>
+      </div>
+      <div class="child">
+        <p>Under Construction</p>
+      </div>
+      <div class="parent caret" >
+        <h4>DOW/NASDAC/SP500:</h4>
+      </div>
+      <div class="child">
+        <p>Under Construction</p>
+      </div>
+      <div class="parent caret" >
+        <h4>Currency:</h4>
+      </div>
+      <div class="child">
+        <p>Under Construction</p>
+      </div><br>
+      <a href="{{ url_for('nkapp.api') }}">DB管理画面に戻る</a><br>
+      <a href="{{ url_for('nkapp.index') }}">メインメニューに戻る</a>
 
-        <div class="parent caret">
-          <h4>Nikkei:</h4>
-        </div>
-        <div class="child">
-          <p>Under Construction</p>
-        </div>
-        <div class="parent caret" >
-          <h4>DOW/NASDAC/SP500:</h4>
-        </div>
-        <div class="child">
-          <p>Under Construction</p>
-        </div>
-        <div class="parent caret" >
-          <h4>Currency:</h4>
-        </div>
-        <div class="child">
-          <p>Under Construction</p>
-        </div>
       </section>
   </div>
   <footer>

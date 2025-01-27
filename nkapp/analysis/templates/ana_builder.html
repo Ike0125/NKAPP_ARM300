@@ -14,18 +14,11 @@
     <div class="sidebar">
       <ul>
         <br><br>
-        <li><a href={{ url_for('analysis.analysis_query31') }}
-          target="_blank" rel="noopener noreferrer"
-          >Analysis31</a></li>
-        <li><a href={{ url_for('rpt.main') }}
-          target="_blank" rel="noopener noreferrer"
-          >Reports</a></li>
-        <li><a href="https://jpx-jquants.com/auth/signin"
-          target="_blank" rel="noopener noreferrer"
-          >APIs</a></li>
-        <li><a href={{ url_for('analysis.builder') }}
-          target="_blank" rel="noopener noreferrer"
-          >Parameters</a></li>
+        <li><a href={{ url_for('analysis.analysis_query31') }}>Analysis31</a></li>
+        <li><a href={{ url_for('rpt.main') }}>Reports</a></li>
+        <li><a href={{ url_for('api.api_main') }}>APIs</a></li>
+        <li><a href={{ url_for('analysis.builder') }}>Parameters</a></li>
+        <li><a href={{ url_for('set.main') }}>System Setting</a></li>
         <li><a href="http://localhost:8888/lab"
           target="_blank" rel="noopener noreferrer"
           >Jupyter Lab</a></li>
