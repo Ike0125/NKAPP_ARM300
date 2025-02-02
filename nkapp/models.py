@@ -261,10 +261,12 @@ class Tl:
     jq_calendar = Table("jq_trading_calendar", metadata, autoload_with=engine)
     statements_table = Table("statements", metadata, autoload_with=engine)
     announcement_table = Table("announcement", metadata, autoload_with=engine)
-    
+
     current_db = SQLALCHEMY_DATABASE_URI
     company = aliased(ListedInfo)
     daily = aliased(DailyQuotesAll)
     dailyquotes = aliased(DailyQuotes)
     tcalendar = aliased(TradingCalendar)
     jqcalendar = aliased(JqTradingCalendar)
+    announcement = aliased(Announcement)
+    statements = aliased(Statements)

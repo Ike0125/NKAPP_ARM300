@@ -21,9 +21,8 @@ def main():
     main_params = Mainparams.get_main_params()
     main_params2 = Set.config()
     mockparams = MK.config()
-    print(f"mockparams:{mockparams}")
+    # print(f"mockparams:{mockparams}")
     return render_template("set_main.html", **main_params, **main_params2, **mockparams)
-    # return render_template("set_main.html", **main_params, **main_params2)
 
 
 @bp_set.route("/daily_printout", methods=['post'])            # Database Structure

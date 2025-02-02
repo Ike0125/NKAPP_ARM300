@@ -130,9 +130,6 @@
         </form>
         <p> 移動平均データ付き</p>
         <br>
-        <br>
-        <p>==============================================</p>
-        <br>
         <h3>Table2: 株価関連(Daily Quotes/prices)</h3>
         <p>DB: Last Updated: {{ last_update }} ; {{ record_count }} records</p>
         <br>
@@ -151,6 +148,22 @@
           <label for="code">銘柄コード:</label>
           <input type="text" name="code" value={{code_query}} ></input>
           <button type="submit">Search</button>
+        </form>
+        <br>
+        <h3>Table4: 財務情報(Statements/fins/statements)</h3>
+          <p>DB: Last Updated: {{ last_update_statements }} ; {{ record_count_statements }} records </p>
+          <br>
+        <form action="{{ url_for('rpt.fin_rpt01') }}" method="post">
+          <label for="stcode">銘柄コード:</label>
+          <input type="text" name="stcode" value={{stcode_query}} ></input>
+          <button type="submit">Submit</button>
+        </form>
+        <form action="{{ url_for('rpt.fin_rpt05') }}" method="post">
+          <label for="stdate1">Date-1:</label>
+          <input type="text" id="stdate1" name="stdate1" value= {{stdate1_value}} required><br>
+          <label for="stdate2">Date-2:</label>
+          <input type="text" id="stdate2" name="stdate2" value= {{stdate2_value}} required>
+          <button type="submit">submit</button>
         </form>
         <br>
         <br>
@@ -188,7 +201,7 @@
             {% endif %}
             <table border= "1">
                   <tr>
-                      <th>銘柄コード</th>
+                      <th>コード</th>
                       <th>会社名</th>
                   </tr>
                   {% for db in db_data %}

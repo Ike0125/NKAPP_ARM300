@@ -415,7 +415,7 @@ class A31:
                     # トータルページ数の計算
                     total_pages = ceil(counts / per_page)
                     initial = 0
-                    # print(f"lists: {lists}")
+                    # print(f"lists: {lists[:5]}")
 
         # 掲示板のパラメータ
         end_time = datetime.now()

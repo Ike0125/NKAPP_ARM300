@@ -20,7 +20,7 @@ header {
   text-align: center;
   display: flex;           /* フレックスボックスで要素を横並びに */
   justify-content: space-between;  /* 左右に配置 */
-   font-size: 14px;
+  font-size: 14px;
   width: 100%;
   position: fixed;
   top: 0;
@@ -30,6 +30,25 @@ header {
 }
 header a {
   color: #fff;
+}
+
+
+/* ヘッダー内のボタン専用のスタイル */
+/* ヘッダー内のボタン専用のスタイル */
+.header-button {
+  background-color: transparent; /* 背景を透明に */
+  color: #fff; /* 文字の色を白に */
+  text-decoration: underline; /* 下線を追加 */
+  border: none; /* 枠をなくす */
+  padding: 5px 8px;
+  font-size: 12px; /* 文字サイズを小さく */
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.header-button:hover {
+  text-decoration: none; /* ホバー時に下線を消す */
+  opacity: 0.7; /* 少し薄くする */
 }
 
 
@@ -163,3 +182,19 @@ footer a {
 .card p {
   margin: 8px 0;
 }
+
+.number-cell {
+  text-align: right;
+}
+
+
+button.link-style {
+  background: none;
+  border: none;
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;  /* ボタンのフォントを親要素と揃える */
+  padding: 0;    /* 不要な余白を削除 */
+}
+

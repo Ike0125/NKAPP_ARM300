@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ head_title }} </title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/base3.css') }}">
+        <script src="/static/js/formatNumbers.js" defer></script>
+    </head>
+    <div class="main-content">
+        <header>
+            <h3>{{header_title }}</h3><br>
+            {% if page > 1 %}
+                <form action="{{ url_for(endpoint) }}" method="post">
+                    <input type="hidden" name="page" value="{{ page - 1 }}">
+                    <input type="hidden" name="stcode" value="{{ stcode }}">
+                    <button type="submit" class="header-button">前のページ</button>
+                </form>
+            {% endif %}
+            {% if page < total_pages %}
+                <form action="{{ url_for(endpoint) }}" method="post">
+                    <input type="hidden" name="page" value="{{ page + 1 }}">
+                    <input type="hidden" name="stcode" value="{{ stcode }}">
+                    <button type="submit" class="header-button">次のページ</button>
+                </form>
+            {% endif %}
+            <p>
+            {% set end = page * per_page %}
+            {% if end > total_records %}
+                {% set end = page * per_page %}
+            {% endif %}
+            全{{ total_records }}件中 {{ (page - 1) * per_page + 1 }}-{{ end }}件目を表示
+            </p>
+        </header>
+        <body>
+                {% if db_data == [] %}
+                    <p> 該当するデータが見つかりません。 </p>
+                {% else %}
+                    <table border= "1">
+                        <tr class="table-header-row">
+                            <th class="min-width-col-2">項目名</th>
+                            <th class="min-width-col-2">当期</th>
+                        </tr>
+                        {% for db in db_data %}
+                            <tr>
+                                <tr><td>開示日</td><td class="text-left">{{ db.DisclosedDate }}</td></tr>
+                                <tr><td>開示時刻</td><td class="text-left">{{ db.DisclosedTime }}</td></tr>
+                                <tr><td>銘柄コード</td><td class="text-left">{{ db.LocalCode }}</td></tr>
+                                <tr><td>開示番号</td><td class="text-left">{{ db.DisclosureNumber }}</td></tr>
+                                <tr>
+                                    <td>開示書類種別</td>
+                                    <td class="text-left" style="max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">
+                                        {{ db.TypeOfDocument }}
+                                    </td>
+                                </tr>
+                                <tr><td>当会計期間の種類</td><td class="text-left">{{ db.TypeOfCurrentPeriod }}</td></tr>
+                                <tr><td>当会計期間開始日</td><td class="text-left">{{ db.CurrentPeriodStartDate }}</td></tr>
+                                <tr><td>当会計期間終了日</td><td class="text-left">{{ db.CurrentPeriodEndDate }}</td></tr>
+                                <tr><td>売上高</td><td class="number-cell">{{ db.NetSales }}</td></tr>
+                                <tr><td>営業利益</td><td class="number-cell">{{ db.OperatingProfit }}</td></tr>
+                                <tr><td>経常利益</td><td class="number-cell">{{ db.OrdinaryProfit }}</td></tr>
+                                <tr><td>当期純利益</td><td class="number-cell">{{ db.Profit }}</td></tr>
+                                <tr><td>一株あたり当期純利益</td><td class="number-cell">{{ db.EarningsPerShare }}</td></tr>
+                                <tr><td>潜在株式調整後EPS</td><td class="number-cell">{{ db.DilutedEarningsPerShare }}</td></tr>
+                                <tr><td>総資産</td><td class="number-cell">{{ db.TotalAssets }}</td></tr>
+                                <tr><td>純資産</td><td class="number-cell">{{ db.Equity }}</td></tr>
+                                <tr><td>自己資本比率</td><td class="number-cell">{{ db.EquityToAssetRatio }}</td></tr>
+                                <tr><td>一株あたり純資産</td><td class="number-cell">{{ db.BookValuePerShare }}</td></tr>
+                                <tr><td>営業活動によるキャッシュフロー</td><td class="number-cell">{{ db.CashFlowsFromOperatingActivities }}</td></tr>
+                                <tr><td>投資活動によるキャッシュフロー</td><td class="number-cell">{{ db.CashFlowsFromOperatingActivities}}</td></tr>
+                                <tr><td>財務活動によるキャッシュフロー</td><td class="number-cell">{{ db.CashFlowsFromFinancingActivities }}</td></tr>
+                                <tr><td>現金及び現金同等物期末残高</td><td class="number-cell">{{ db.CashAndEquivalents }}</td></tr>
+                                <tr><td>売上高_予想_期末</td><td class="number-cell">{{ db.ForecastNetSales }}</td></tr>
+                                <tr><td>営業利益_予想_期末</td><td class="number-cell">{{ db.ForecastOperatingProfit }}</td></tr>
+                                <tr><td>経常利益_予想_期末</td><td class="number-cell">{{ db.ForecastOrdinaryProfit }}</td></tr>
+                                <tr><td>当期純利益_予想_期末</td><td class="number-cell">{{ db.ForecastProfit }}</td></tr>
+                                <tr><td>一株あたり当期純利益_予想_期末</td><td class="number-cell">{{ db.ForecastEarningsPerShare }}</td></tr>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endif %}
+        </body>
+        <footer>
+            <a href="{{ url_for(return_url) }}"> {{return_name}} </a>
+            <p>© 2024 SWFSOMA013 All Rights Reserved.</p>
+            <p>{{ current_time }}</p>
+        </footer>
+    </div>
+</html>

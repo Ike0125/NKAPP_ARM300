@@ -64,7 +64,7 @@ class Mainparams:
                 ).scalar()  # statements最終更新日
                 start_statements = session.query(
                     func.min(Tl.statements_table.c.DisclosedDate)
-                ).scalar()  # daily_quotesスタート
+                ).scalar()  # statementsスタート
         current_time = Mainparams.get_current_time()
         db = Tl.current_db
         at_db = db.find('@')

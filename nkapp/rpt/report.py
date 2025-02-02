@@ -1,6 +1,7 @@
 """  nkapp.rpt.report.py  """
 # from flask import render_template
 from math import ceil
+from datetime import datetime, timedelta
 from flask import request
 from sqlalchemy import select, func
 from sqlalchemy.orm import aliased
@@ -167,6 +168,15 @@ class Infoparams:
             companyname_query = request.args.get("companyname", "").strip()
             # 初期表示時は空の結果を返す
             is_initial_request = not bool(request.args.get("companyname", "").strip())
+            last_update_statements = session.query(func.max(Tl.statements.DisclosedDate)).scalar()
+            statements_value = datetime.strptime(last_update_statements, "%Y-%m-%d").date()
+            st1_value = statements_value - timedelta(days=3)
+
+            stdate1_value = st1_value.strftime("%Y-%m-%d")
+            stdate2_value = last_update_statements
+            print(f"stdate1_value:{stdate1_value}")
+            print(f"stdate2_value:{stdate2_value}")
+
             # print(f"Searching for initial_request: {is_initial_request}")
             # print(f"Request args: {request.args}")
             # print(f"Initial parameter: {request.args.get('initial')}")
@@ -210,7 +220,9 @@ class Infoparams:
                 "page": page,
                 "per_page": per_page,
                 "companyname_query": companyname_query,
-                "initial": initial
+                "initial": initial,
+                "stdate1_value" : stdate1_value,
+                "stdate2_value" : stdate2_value
             }
         # print(f"Searching for companyname: {companyname_query}")
         # print(f"SQL Query: {base_query}")

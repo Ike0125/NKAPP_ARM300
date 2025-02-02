@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ head_title }} </title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/base3.css') }}">
+        <script src="/static/js/formatNumbers.js" defer></script>
+    </head>
+    <div class="main-content">
+        <header>
+            <h3>{{header_title }}</h3><br>
+            {% if page > 1 %}
+                <form action="{{ url_for("rpt.fin_rpt05") }}" method="post">
+                    <input type="hidden" name="page" value="{{ page - 1 }}">
+                    <input type="hidden" name="stdate1" value="{{ stdate1 }}">
+                    <input type="hidden" name="stdate2" value="{{ stdate2 }}">
+                    <button type="submit" class="header-button">前のページ</button>
+                </form>
+            {% endif %}
+            {% if page < total_pages %}
+                <form action="{{ url_for("rpt.fin_rpt05") }}" method="post">
+                    <input type="hidden" name="page" value="{{ page + 1 }}">
+                    <input type="hidden" name="stdate1" value="{{ stdate1 }}">
+                    <input type="hidden" name="stdate2" value="{{ stdate2 }}">
+                    <button type="submit" class="header-button">次のページ</button>
+                </form>
+            {% endif %}
+            <p>
+            {% set end = page * per_page %}
+            {% if end > total_records %}
+                {% set end = page * per_page %}
+            {% endif %}
+            全{{ total_records }}件中 {{ (page - 1) * per_page + 1 }}-{{ end }}件目を表示
+            </p>
+        </header>
+        <body>
+                {% if db_data == [] %}
+                    <p> 該当するデータが見つかりません。 </p>
+                {% else %}
+                    <table border= "1">
+                        <tr class="table-header-row">
+                            <th class="min-width-col-3">コード</th>
+                            <th class="min-width-col-2">会社名</th>
+                            <th class="min-width-col-1">開示日</th>
+                            <th class="min-width-col-1">当期EPS</th>
+                            <th class="min-width-col-1">予想期末EPS</th>
+                        </tr>
+                        {% for db in db_data %}
+                            <tr>
+                                <td class="text-left"><a href="{{ url_for('rpt.info_card', code=db.LocalCode) }}">
+                                    {{ db.LocalCode }}</a>
+                                </td>
+                                <td class="text-left"><a href="{{ url_for('rpt.fin_rpt01') }}">
+                                    <form action="{{ url_for("rpt.fin_rpt01") }}" method="post">
+                                        <input type="hidden" name="stcode" value="{{ db.LocalCode }}">
+                                        <button type="submit" class="link-style"> {{ db.companyname }}</button>
+                                    </form>
+                                </td>
+                                <td class="text-left">{{ db.DisclosedDate }}</td>
+                                <td class="number-cell">{{ db.EarningsPerShare }}</td>
+                                <td class="number-cell">{{ db.ForecastEarningsPerShare }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endif %}
+        </body>
+        <footer>
+            <a href="{{ url_for(return_url) }}"> {{return_name}} </a>
+            <p>© 2024 SWFSOMA013 All Rights Reserved.</p>
+            <p>{{ current_time }}</p>
+        </footer>
+    </div>
+</html>

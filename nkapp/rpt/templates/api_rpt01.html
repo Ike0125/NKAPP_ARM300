@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ head_title }} </title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/base3.css') }}">
+    </head>
+    <div class="main-content">
+        <header>
+            <h2>{{header_title }}</h2>
+            {% if page > 1 %}
+                <a href="{{ url_for(endpoint, page=page-1, code=code_query) }}">前のページ</a>
+            {% endif %}
+            {% if page < total_pages %}
+                <a href="{{ url_for(endpoint, page=page+1, code=code_query) }}">次のページ</a>
+            {% endif %}
+            <p>
+            {% set end = page * per_page %}
+            {% if end > total_records %}
+                {% set end = page * per_page %}
+            {% endif %}
+            銘柄コード：{{code_query}}：全{{ total_records }}件中 {{ (page - 1) * per_page + 1 }}-{{ end }}件目を表示
+            </p>
+        </header>
+        <body>
+                {% if db_data == [] %}
+                    <p> 該当するデータが見つかりません。</p><br>
+                    <a href="{{url_for(return_url)}}">{{return_name}}</a>
+                {% else %}
+                    <table border= "1">
+                        <tr class="table-header-row">
+                            <th class="min-width-col-1">日付</th>
+                            <th class="min-width-col-3">コード</th>
+                            <th class="min-width-col-2">会社名</th>
+                            <th class="min-width-col-1" >決算期末</th>
+                            <th class="min-width-col-1">業種名</th>
+                            <th class="min-width-col-1">決算種別</th>
+                            <th class="min-width-col-1">市場区分</th>
+                        </tr>
+                        {% for db in db_data %}
+                            <tr>
+                                <td class="text-center">{{db.Date}}</td>
+                                <td class="text-center"><a href="{{ url_for('rpt.info_card', code=db.Code) }}">{{ db.Code }}</a></td>
+                                <td class="text-left"><a href="{{ url_for('rpt.fin_rpt01') }}">
+                                    <form action="{{ url_for("rpt.fin_rpt01") }}" method="post">
+                                        <input type="hidden" name="stcode" value="{{ db.Code }}">
+                                        <button type="submit" class="link-style"> {{ db.CompanyName }}</button>
+                                    </form>
+                                </td>
+                                <td class="text-center">{{db.FiscalYear}}</td>
+                                <td class="text-left">{{db.SectorName}}</td>
+                                <td class="text-center">{{db.FiscalQuarter}}</td>
+                                <td class="text-left">{{db.Section}}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endif %}
+        </body>
+        <footer>
+            <a href="{{url_for(return_url)}}">{{return_name}}</a>
+            <p>© 2024 SWFSOMA013 All Rights Reserved.</p>
+            <p>{{ current_time }}</p>
+        </footer>
+    </div>
+</html>

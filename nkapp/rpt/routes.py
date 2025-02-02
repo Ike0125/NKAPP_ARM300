@@ -4,6 +4,9 @@ from nkapp.config import Mainparams
 from nkapp.rpt.report import Infoparams
 from nkapp.rpt.report10 import Infoparams10
 from nkapp.rpt.report11 import Chartparams
+from nkapp.rpt.api_rpt01 import ApiRpt
+from nkapp.rpt.rpt_fin01 import FinRpt
+
 
 #  Blueprintのインスタンス作成
 bp_rpt = Blueprint("rpt", __name__, template_folder="templates")
@@ -90,3 +93,30 @@ def get_chart():                                # 出力は、rpt.main.htmlへ
     main_params = Chartparams.get_chart()
     # print(main_params)
     return render_template("chart_test.html", **main_params)
+
+
+@bp_rpt.route("/api_rpt01")            # 株価/上場銘柄複合画面
+def api_rpt01():
+    """  Report BBS: Announcement/ fins """
+    main_params = ApiRpt.api_rpt01(mode=1)
+    main_params2 = ApiRpt.rpt01_config()
+
+    return render_template("api_rpt01.html", **main_params, **main_params2)
+
+
+@bp_rpt.route("/fin_rpt01", methods=["POST"])            # 財務情報詳細
+def fin_rpt01():
+    """  Report BBS: Statements/ fins """
+    main_params  = FinRpt.fin01_config()
+    main_params2 = FinRpt.fin_rpt01()
+
+    return render_template("financial_info.html", **main_params, **main_params2)
+
+
+@bp_rpt.route("/fin_rpt05", methods=["GET","POST"])            # 財務情報詳細
+def fin_rpt05():
+    """  Report BBS: Statements/ fins """
+    main_params  = FinRpt.fin01_config()
+    main_params2 = FinRpt.fin_rpt05()
+
+    return render_template("financial_list.html", **main_params, **main_params2)
