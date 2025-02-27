@@ -1,12 +1,17 @@
 """  nkapp.rpt.fin01.py  """
+# import datetime
 from math import ceil
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from flask import request
 from sqlalchemy import select, func
 from sqlalchemy import and_
 from sqlalchemy import cast, Float
+# from sqlalchemy import case, literal
+from sqlalchemy.orm import aliased
 from nkapp.config import Config, Reportparams
 from nkapp.models import Session
+from nkapp.analysis.analysis20 import Ana
+from nkapp.analysis.analysis31 import A31
 from .models import Tl
 
 class FinRpt:
@@ -42,7 +47,7 @@ class FinRpt:
             if request.method == "POST":
                 stcode = request.form.get("stcode","72030")
                 page   = int(request.form.get("page", 1))
-                print(f"page  : {page}")
+                # print(f"page  : {page}")
                 # 会社名
                 companyname = db_session.query(company.companyname).filter(company.code == stcode).scalar()
                 header_title = f"財務情報 :{stcode} -{companyname[:20]}"
@@ -91,8 +96,8 @@ class FinRpt:
             paginated_query = base_query.offset(offset).limit(per_page)
             # クエリを実行し、全レコードを取得
             raw_data = db_session.execute(paginated_query).mappings().all()
-            print(f"stcode  : {stcode}")
-            print(f"raw data: {raw_data[:5]}")
+            # print(f"stcode  : {stcode}")
+            # print(f"raw data: {raw_data[:5]}")
 
         total_pages = ceil(counts / per_page)  # トータルページ数の計算
         info_params = {
@@ -121,23 +126,30 @@ class FinRpt:
         header_title = "財務情報"
         stdate1 = ""
         stdate2 = ""
+        ana_config = Ana.load_config("ana_config.json")
 
         with Session() as db_session:  # セッション開始
+
             if request.method == "POST":
                 stdate1 = request.form.get("stdate1","")
                 stdate2 = request.form.get("stdate2","")
                 page   = int(request.form.get("page", 1))
             elif request.method == "GET":
                 last_update_statements = db_session.query(func.max(Tl.statements.DisclosedDate)).scalar()
+                if last_update_statements is None:
+                    last_update_statements = date.today()
+                    last_update_statements = last_update_statements.strftime("%Y-%m-%d")
+
                 statements_value = datetime.strptime(last_update_statements, "%Y-%m-%d").date()
-                st1_value = statements_value - timedelta(days=3)
+                st1_value = statements_value - timedelta(days=10)
 
                 stdate1 = st1_value.strftime("%Y-%m-%d")
                 stdate2 = last_update_statements
-                print(f"stdate1_value:{stdate1}")
-                print(f"stdate2_value:{stdate2}")
 
             header_title = f"財務情報 :{stdate1} to {stdate2}"
+            subquery = A31.ana_query_mkt().subquery()
+            aliased_subquery = aliased(subquery)
+
             base_query = (
                 select(
                     fin.DisclosedDate,
@@ -167,17 +179,20 @@ class FinRpt:
                     fin.ForecastOrdinaryProfit,
                     fin.ForecastProfit,
                     fin.ForecastEarningsPerShare,
-                    company.companyname
+                    aliased_subquery.c.code,
+                    aliased_subquery.c.companyname,
+                    # company.companyname
                 )
-                .join(company, company.code == fin.LocalCode)
+                # .join(company, company.code == fin.LocalCode)
+                .join(aliased_subquery, fin.LocalCode == aliased_subquery.c.code )
                 .where(
                         and_(
                             func.to_date(fin.DisclosedDate, 'YYYY-MM-DD') >= func.to_date(stdate1, 'YYYY-MM-DD'),
                             func.to_date(fin.DisclosedDate, 'YYYY-MM-DD') <= func.to_date(stdate2, 'YYYY-MM-DD')
                         )
                     )
-                .order_by(func.to_date(fin.DisclosedDate, 'YYYY-MM-DD').desc())
                 .order_by(cast(func.nullif(fin.ForecastEarningsPerShare, ''), Float).desc().nulls_last())
+                .order_by(func.to_date(fin.DisclosedDate, 'YYYY-MM-DD').desc())
             )
             # 総レコード数を取得
             # pylint: disable=not-callable
@@ -223,13 +238,17 @@ class FinRpt:
                 stdate2 = request.form.get("stdate2","")
             elif request.method == "GET":
                 last_update_statements = db_session.query(func.max(Tl.statements.DisclosedDate)).scalar()
+                if last_update_statements is None:
+                    last_update_statements = date.today()
+                    last_update_statements = last_update_statements.strftime("%Y-%m-%d")
+
                 statements_value = datetime.strptime(last_update_statements, "%Y-%m-%d").date()
                 st1_value = statements_value - timedelta(days=3)
 
                 stdate1 = st1_value.strftime("%Y-%m-%d")
                 stdate2 = last_update_statements
-                print(f"stdate1_value:{stdate1}")
-                print(f"stdate2_value:{stdate2}")
+                # print(f"stdate1_value:{type(stdate1)}")
+                # print(f"stdate2_value:{type(stdate2)}")
 
             base_query = (
                 select(

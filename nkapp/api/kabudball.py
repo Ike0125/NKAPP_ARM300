@@ -3,7 +3,6 @@ from datetime import datetime
 from time import sleep, time
 import requests
 from flask import flash
-# from flask import redirect, url_for
 from sqlalchemy import select
 from sqlalchemy import func, text
 from sqlalchemy.orm import Session
@@ -45,7 +44,7 @@ class JQDB:
             step_start = time()
             new_codes = []  # 実際には適切なAPI呼び出しまたはデータ取得を行う
             all_codes.extend(new_codes)
-            print(f"new codes:{new_codes}")
+            # print(f"new codes:{new_codes}")
             print(f"New codes processing time: {time() - step_start:.2f} seconds")
             # 各銘柄ごとにデータ取得と保存
 
@@ -168,14 +167,13 @@ class JQDB:
     def update_tradingcalendar():
         """Updating Trading Calendar"""
         # Tl.daily_table から最新の日付を取得
-        with Session(engine) as session:
+        with Session(engine) as db_session:
             try:
                 daily      = Tl.daily         # DailyQuotesAll
-                #daily = Tl.dailyquotes  # DailyQuotes
                 t_calendar = Tl.t_calendar  # TradingCalendar
 
-                max_trade_date_no = session.query(func.max(TradingCalendar.trade_date_no)).scalar()
-                seq_current_value = session.execute(text("SELECT last_value FROM trade_date_no_seq")).scalar()
+                max_trade_date_no = db_session.query(func.max(TradingCalendar.trade_date_no)).scalar()
+                seq_current_value = db_session.execute(text("SELECT last_value FROM trade_date_no_seq")).scalar()
 
                 if max_trade_date_no is None:
                     max_trade_date_no = 0  # テーブルが空の場合
@@ -192,8 +190,8 @@ class JQDB:
                                 f"Please manually reset the sequence to {max_trade_date_no + 1}."
                         )
                 # daily の最新日付を取得
-                d_date = session.query(func.max(daily.date)).scalar()
-                t_date = session.query(func.max(t_calendar.c.tradingdate)).scalar()
+                d_date = db_session.query(func.max(daily.date)).scalar()
+                t_date = db_session.query(func.max(t_calendar.c.tradingdate)).scalar()
 
                 if not d_date:
                     flash("No dates found in DailyQuotesAll. Aborting update.", "error")
@@ -202,7 +200,7 @@ class JQDB:
                 if t_date is None:
                     # TradingCalendar が空の場合、初期データを挿入
                     flash("TradingCalendar is empty. Rebuilding with initial data.", "message")
-                    JQDB._initialize_trading_calendar(session, daily, d_date)
+                    JQDB._initialize_trading_calendar(db_session, daily, d_date)
                     return
 
                 # 更新が必要か確認
@@ -212,7 +210,7 @@ class JQDB:
 
                 # TradingCalendar に追加する営業日を取得
                 trading_dates = (
-                    session.query(daily.date)
+                    db_session.query(daily.date)
                     .filter(daily.date > t_date, daily.date <= d_date)
                     .distinct()
                     .order_by(daily.date)
@@ -222,22 +220,22 @@ class JQDB:
                 # TradingCalendar にデータを追加
                 for date in trading_dates:
                     new_entry = TradingCalendar(tradingdate=date[0])
-                    session.add(new_entry)
+                    db_session.add(new_entry)
 
                 # コミットして変更を保存
-                session.commit()
+                db_session.commit()
                 flash("Trading calendar has been updated to match daily_table.", "success")
 
             except SQLAlchemyError as e:
                 # ロールバックしてエラーを処理
-                session.rollback()
+                db_session.rollback()
                 flash(f"Database Connecting Error: {e}", "error")
             except ValueError as e:
                 print(f"Error: {e}")
                 flash(f"{e}:", "error")
             finally:
                 # セッションを閉じる
-                session.close()
+                db_session.close()
 
         return
 

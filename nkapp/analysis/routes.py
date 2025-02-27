@@ -90,7 +90,6 @@ def reset_csv():
 @bp_analysis.route("/test_select", methods=["GET","POST"])
 def test_select():
     """  Routing for Treeview BBS  """
-    print("Post_されました")
     config_builder = Tst2.test_select()
     main_params = FR.select_file()
     return render_template('test_select.html', **config_builder, **main_params)

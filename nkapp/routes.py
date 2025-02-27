@@ -6,19 +6,23 @@ from nkapp.rpt.rpt_fin01 import FinRpt
 
 
 # Blueprintの設定
-
 bp_nkapp = Blueprint('nkapp', __name__)
+
 
 # ダッシュボード関連
 @bp_nkapp.route('/')                        # メイン画面
 def index():
     """  Routing for Main BBS  """
-    main_params = Mainparams.get_main_params()
-    main_params2 = ApiRpt.config()
-    main_params3 = ApiRpt.api_rpt01(mode=2)
-    main_params4 = FinRpt.fin_rpt06()
-
-    return render_template('nkapp_main.html', **main_params, **main_params2, **main_params3, **main_params4)
+    main_params = Mainparams.get_main_params()  # DB用
+    main_params2 = ApiRpt.config()              # Announcement初期設定
+    main_params3 = ApiRpt.api_rpt01(mode=2)     # Announcementデータ
+    main_params4 = FinRpt.fin_rpt06()           # Statement初期設定,データ
+    # print(f"main_params2:{main_params2}")
+    # print(f"main_params3:{main_params3}")
+    # print(f"main_params4:{main_params4}")
+    return render_template(
+        'nkapp_main.html', **main_params, **main_params2, **main_params3, **main_params4
+    )
 
 
 @bp_nkapp.route('/setting')                 # 設定関連

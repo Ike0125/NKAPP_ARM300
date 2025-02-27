@@ -84,13 +84,8 @@ class Analysisparams30:
     def querybuilder():
         """for querybuilder"""
         # 初期設定値
-        # paramname21 = "移動平均日数"
         daygap101 = "何日前"
         daygap102 = "何日前"
-        # paramname101 = "Param101"
-        # paramname102 = "Param102"
-        # paramname103 = "Param103"
-        # paramname104 = "Param104"
         # 掲示板から選択値を取得し、保存
         if request.method == "POST":
             session["cal_select101"] = request.form.get("dropdown101")
@@ -116,7 +111,6 @@ class Analysisparams30:
         paramquery104 = session.get("paramquery104", "")
         gapquery101 = session.get("gapquery101", 0)
         gapquery102 = session.get("gapquery102", 0)
-        # print(f"Readin_dropdown201: {dropdown201}")
 
         # 掲示板へのデータまとめ
         ana_config = Ana.load_config("ana_config.json")
@@ -138,22 +132,14 @@ class Analysisparams30:
             "cal_select102": cal_select102,  # 計算方法A-2
             "ope_select130": ope_select130,  # 演算子
             "sort_select140": sort_select140,  # ソート順
-            # "Key_select101": key_select101,  # KEY Column
             "VALUE_MAP10": VALUE_MAP10,  # 市場区分コードリスト
             "VALUE_MAP20": VALUE_MAP20,  # 計算方法リスト
             "VALUE_MAP30": VALUE_MAP30,  # 演算子リスト
             "VALUE_MAP40": VALUE_MAP40,  # ソート順リスト
             "VALUE_MAP41": VALUE_MAP41,  # KEY Columnリスト
             "window_201" : window_201,  # 移動平均日数
-            # "window_202"   : window_202,  # 移動平均日数
             "daygap101"   : daygap101,  # 何日前
             "daygap102"   : daygap102,  # 何日前
-            # "paramname101": paramname101,  # パラメータA01
-            # "paramname102": paramname102,  # パラメータA02
-            # "paramname103": paramname103,  # パラメータA03
-            # "paramname104": paramname104,  # パラメータA04
-            # "calquery101": calqueryA01,  # 計算方法params
-            # "calquery102": calqueryA02,  # 計算方法params
             "gapquery101": gapquery101,  # 何日前params
             "gapquery102": gapquery102,  # 何日前params
             "paramquery101": paramquery101,  # 計算params
@@ -161,7 +147,6 @@ class Analysisparams30:
             "paramquery103": paramquery103,  # 計算params
             "paramquery104": paramquery104,  # 計算params
         }
-        # print(f"builder_params: {builder_params}")
         return builder_params
 
     @staticmethod
@@ -174,20 +159,14 @@ class Analysisparams30:
         config = Analysisparams30.config()
         start_time = datetime.now()
         column_name = ""
-        # builder = Analysisparams10.querybuilder()
         builders = builder_params
         per_page = config["per_page"]
         if request.method == "POST":
             page = 1
         else:
             page = request.args.get("page", 1, type=int)
-        # print(f"builder_params: {builders}")
         with Session() as session:  # セッション開始
             # 初期表示時は空の結果を返す
-            # is_initial_request = not bool(request.args.get("filter2", "").strip())
-            # if is_initial_request or not request.args.get("filter2", "").strip():
-            print(f"page1: {page}")
-            # if request.method != "POST":
             if request.method != "POST" and "page" not in request.args:
                 print("postでないよ")
                 lists = []
@@ -212,7 +191,6 @@ class Analysisparams30:
                     return {"error": "クエリの生成に失敗しました"}
                 if base_query is None:
                     return {"error": "クエリの生成に失敗しました"}
-                # print(f"base_query: {base_query}")
                 # 総レコード数を取得
                 # pylint: disable=not-callable
                 count_query = select(func.count()).select_from(base_query.subquery())
@@ -228,11 +206,8 @@ class Analysisparams30:
                 # sqlalchemyクエリを実行し、全レコードを取得
                 lists = session.execute(paginated_query).fetchall()
                 # トータルページ数の計算
-                # print(f"db_data: {lists}")
                 total_pages = ceil(counts / per_page)
                 initial = 0
-                # print(f"page2: {page}")
-                # print(f"lists: {lists}")
         # 掲示板のパラメータ
         params = Analysisparams30.params(
             column_name, lists, counts, total_pages, page, per_page, initial,
@@ -241,8 +216,6 @@ class Analysisparams30:
         end_time = datetime.now()
         query_time = end_time - start_time
         print(f"Query_time: {query_time}")
-        print(f"params: {params}")
-        print(f"paramname103: {paramname103}")
         return params
 
     @staticmethod
@@ -280,7 +253,6 @@ class Analysisparams30:
                 .where(marketcode_condition)
                 .subquery()
             )
-        # print(f"subquery: {subquery}")
 
         subquery2 = (
             select(
@@ -295,7 +267,6 @@ class Analysisparams30:
             .where(and_(Tl.daily.date >= start_day, Tl.daily.date <= end_day))
             .subquery()
         )
-        # print(f"subquery2: {subquery2}")
 
         base_query = (
             select(subquery.c.code, subquery.c.companyname, subquery2.c.deviation_rate)
@@ -315,7 +286,6 @@ class Analysisparams30:
                 )
             )
         )
-        # print(f"base_query: {base_query}")
         return base_query
 
     @staticmethod
@@ -353,7 +323,6 @@ class Analysisparams30:
                 .where(marketcode_condition)
                 .subquery()
             )
-        # print(f"subquery: {subquery}")
 
         subquery2 = (
             select(
@@ -368,7 +337,6 @@ class Analysisparams30:
             .where(and_(Tl.daily.date >= start_day, Tl.daily.date <= end_day))
             .subquery()
         )
-        # print(f"subquery2: {subquery2}")
 
         base_query = (
             select(subquery.c.code, subquery.c.companyname, subquery2.c.deviation_rate)
@@ -388,7 +356,6 @@ class Analysisparams30:
                 )
             )
         )
-        # print(f"base_query: {base_query}")
         return base_query
 
 
@@ -401,12 +368,10 @@ class Analysisparams30:
         window = int(builders["rsi_period_value"])
         day_gap = int(builders["daygap101"])
         ana_param32 = float(builders["paramquery103"])
-        # key_column = builders["selected41"]
         key_column = f"rsi_{window}"
         with Session() as session:
             last_update = session.query(func.max(Tl.daily_table.c.date)).scalar()
             end_day = last_update - timedelta(days=day_gap)
-            # start_day = end_day - timedelta(days=window + 2)  # RSI用に＋２日分
             # marketcodeの条件を動的に設定
             marketcode_condition = case(
                 (literal(marketcode_query) == "0100", True),  # "0100"の場合は常にTrue
@@ -422,20 +387,7 @@ class Analysisparams30:
                 .where(marketcode_condition)
                 .subquery()
             )
-        # print(f"subquery: {subquery}")
         rsi_query = VT.rsi(window).subquery("rsi_subquery")
-
-        # subquery2 = (
-        #    select(
-        #        Tl.daily.code,
-        #        Tl.daily.date,
-        #        Tl.daily.adjustmentclose,
-        #        rsi_query.c[f"rsi_{window}"]
-        #    )  # RSIを計算
-        #    .where(and_(Tl.daily.date >= start_day, Tl.daily.date <= end_day))
-        #    .subquery()
-        # )
-        # print(f"subquery2: {subquery2}")
 
         base_query = (
             select(
@@ -452,8 +404,6 @@ class Analysisparams30:
                 )
             )
         )
-        # print(f"base_query: {base_query}")
-        # print(f"RSI:rsi_{window}")
         return base_query
 
     @staticmethod
@@ -466,12 +416,12 @@ class Analysisparams30:
         short_window = int(builders["macd_short_value"])
         long_window = int(builders["macd_long_value"])
         signal_window = int(builders["macd_signal_value"])
-        print(f"marketcode_query: {marketcode_query}")
-        print(f"ana_sort: {ana_sort}")
-        print(f"day_gap: {day_gap}")
-        print(f"short_window: {short_window}")
-        print(f"long_window: {long_window}")
-        print(f"signal_window: {signal_window}")
+        # print(f"marketcode_query: {marketcode_query}")
+        # print(f"ana_sort: {ana_sort}")
+        # print(f"day_gap: {day_gap}")
+        # print(f"short_window: {short_window}")
+        # print(f"long_window: {long_window}")
+        # print(f"signal_window: {signal_window}")
 
         with Session() as session:
             # データ取得期間計算
@@ -551,12 +501,12 @@ class Analysisparams30:
         day_gap = int(builders["gapquery101"])
         ana_param32 = float(builders["paramquery103"])
         # key_column = f"rsi_{window}"
-        print(f"marketcode_query: {marketcode_query}")
-        print(f"operator: {operator}")
+        # print(f"marketcode_query: {marketcode_query}")
+        # print(f"operator: {operator}")
         # print(f"ana_sort: {ana_sort}")
-        print(f"window: {window}")
-        print(f"day_gap: {day_gap}")
-        print(f"ana_param32: {ana_param32}")
+        # print(f"window: {window}")
+        # print(f"day_gap: {day_gap}")
+        # print(f"ana_param32: {ana_param32}")
 
         with Session() as session:
             last_update = session.query(func.max(Tl.daily_table.c.date)).scalar()
@@ -600,7 +550,6 @@ class Analysisparams30:
                 .over(partition_by=base_query.c.code, order_by=base_query.c.date)
                 .label("lag_value"),
             ).subquery()
-            # print(f"lag_query: {lag_query}")
             # **修正ポイント2：lag_valueがNULLでない行を選択し、price_changeを計算**
             rsi_query = (
                 select(
@@ -633,18 +582,7 @@ class Analysisparams30:
                 rows=(-(window - 1), 0),
             )
 
-            # RSIの計算（ゼロ除算を防ぐための条件分岐を追加）
-            # pylint: disable=not-callable
-            # rs = func.coalesce(avg_gain / func.nullif(avg_loss, 0), 0)
-            # rsi_value = case(
-            #    (avg_loss == 0, 100),
-            #    (avg_gain == 0, 0),
-            #    else_=100 - (100 / (1 + rs))
-            # ).label('rsi_value')
-            # rsi_final = func.coalesce(rsi_value, 50).label('rsi_final')
-            # print(f"rsi_final_data: {rsi_final}")
             rs = case((avg_loss != 0, avg_gain / avg_loss), else_=0).label("rs")
-
             rsi_final = 100 - (100 / (1 + rs))
 
             # 最終的なクエリ
@@ -654,7 +592,6 @@ class Analysisparams30:
                 rsi_query.c.date,
                 rsi_final.label("rsi_final"),
             ).subquery()
-            # print(f"final_query: {final_query}")
             # フィルタリングとソート
             result_query = (
                 select(
@@ -668,7 +605,6 @@ class Analysisparams30:
                     Analysisparams30.get_sort_order(ana_sort, final_query.c.rsi_final)
                 )
             )
-            # print(f"result_query: {result_query}")
             print(
                 f"Base query count: {session.execute(select(func.count()).select_from(base_query)).scalar()}"
             )

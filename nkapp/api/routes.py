@@ -5,7 +5,6 @@ from nkapp.config import Mainparams
 from nkapp.api.api_main import AP, APJQ                   # トークンデータ取得・保存/上場銘柄一覧データ取得
 from nkapp.api.kabudb import retrieve_kabudb_request      # 株価データ取得（選択）
 from nkapp.api.kabudball import JQDB                      # 株価データ取得（一括）
-# from nkapp.api.kabudball_new import JQDB2               # 株価データ取得（一括）
 from nkapp.api.kabudball3 import JQDB3                    # 株価データ取得（一括）
 from nkapp.api.statements import JQST
 from nkapp.api.announcement import JQAN
@@ -104,7 +103,7 @@ def kabudball_update_date():
 @bp_api.route("/jqcalendar_update", methods=["POST"])
 def jqcalendar_update():
     """
-    Kabudbリクエストを処理し、データを取得して保存する。
+    jqcalendarリクエストを処理し、データを取得して保存する。
     """
     APJQ.jqcalendar_update()
 

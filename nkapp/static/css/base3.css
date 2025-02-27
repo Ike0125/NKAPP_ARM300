@@ -198,3 +198,27 @@ button.link-style {
   padding: 0;    /* 不要な余白を削除 */
 }
 
+.parent {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  font-weight: bold;
+  }
+  .arrow {
+  margin-right: 8px;
+  font-size: 20px;
+  }
+  .child {
+  display: none; /* ページロード時は非表示 */
+  margin-left: 20px; /* 親からのインデント */
+  }
+  .caret::before {
+    content: "▶";   /* マークの指定 */
+    font-size: 15px; /* フォントサイズの調整 */
+    margin-right: 5px; /* 右側の余白 */
+    vertical-align: middle; /* テキストと垂直方向の位置を中央に */
+  }
+  .caret-down::before {
+    content: "▼"; /* 展開時のマーク */
+  }

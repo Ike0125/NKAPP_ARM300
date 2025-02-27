@@ -3,21 +3,13 @@ from flask import redirect, url_for
 from sqlalchemy import inspect
 from sqlalchemy.exc import SQLAlchemyError
 from nkapp.models import Session
-# from sqlalchemy import create_engine
-# from nkapp.models import Tl
 
 
 def table_list():
     """  データベースに接続しのテーブル・カラム確認する """
     with Session() as session:
         try:
-            # データベースエンジンの作成
-            # db_url = "sqlite:///data/stocks.db"  # あなたのデータベースURLに置き換えてください
-            #engine = create_engine(db_url)
-            # インスペクターの作成
             inspector = inspect()
-            # データベース接続のテスト
-            #with engine.connect() as connection:
             # テーブル一覧の取得
             tables = inspector.get_table_names()
             print("データベース接続成功!")
@@ -38,9 +30,3 @@ def table_list():
             session.close()
 
         return redirect(url_for("set.main"))
-
-
-
-# if __name__ == "__main__":
-#    db_url = "sqlite:///data/stocks.db"  # あなたのデータベースURLに置き換えてください
-#    check_database_connection(db_url)

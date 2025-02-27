@@ -113,7 +113,7 @@ def fin_rpt01():
     return render_template("financial_info.html", **main_params, **main_params2)
 
 
-@bp_rpt.route("/fin_rpt05", methods=["GET","POST"])            # 財務情報詳細
+@bp_rpt.route("/fin_rpt05", methods=["GET","POST"])            # 財務情報リスト
 def fin_rpt05():
     """  Report BBS: Statements/ fins """
     main_params  = FinRpt.fin01_config()

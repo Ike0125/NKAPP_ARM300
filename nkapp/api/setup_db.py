@@ -1,3 +1,4 @@
+"""setup_db.py"""
 from sqlalchemy import create_engine, text
 
 # データベース接続設定
@@ -6,6 +7,7 @@ SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:karasuyama4176@localhost:5432/n
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
 
 def add_unique_constraint():
+    """Set unique on database"""
     with engine.connect() as connection:
         # 一意制約を追加
         connection.execute(

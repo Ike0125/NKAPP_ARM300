@@ -3,7 +3,6 @@ import json
 import os
 from tkinter import Tk, filedialog
 from flask import request, redirect, url_for
-# from nkapp.config import Config
 from .config import VALUE_MAP10, VALUE_MAP11, VALUE_MAP12, VALUE_MAP13, VALUE_MAP14
 
 
@@ -14,7 +13,6 @@ class Ana:
         """initial params for "ana_builder.html"""
         ana_config = Ana.load_config("ana_config.json")
         config_builder = {
-            # "current_time" : Config.get_current_time(),
             "endpoint": "analysis.analysis_query31",
             "return_url": "analysis.analysis_query31",
             "return_name": "To analysis31",
@@ -195,7 +193,6 @@ class Formulaparams:
             }
             status ="Success-Register"
 
-            # print(f"config_macd: {config_macd}")
             config_formula.update(config_macd)
             Ana.save_config("ana_config.json",config_formula)
         else:

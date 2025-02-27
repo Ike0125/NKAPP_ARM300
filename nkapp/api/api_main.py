@@ -2,9 +2,7 @@
 import json
 import os
 import time
-# from time import sleep
 from datetime import datetime, timedelta
-# from time import time
 import requests
 from flask import redirect, url_for, flash
 from flask import session,request
@@ -27,7 +25,7 @@ class AP:
         refresh_token_timestamp = config_data.get("REFRESH_TOKEN_TIMESTAMP","")
         announcement_timestamp = config_data.get("ANNOUNCEMENT_TIMESTAMP","")
         # 更新日のギャップ：
-        update_gap =84
+        update_gap = 0
         # 現在の時間を取得
         current_time = datetime.now()
         current_day  = datetime.now().date()
@@ -309,7 +307,7 @@ class APJQ:
                     if r_get.status_code == 200:
                         try:
                             response_data = r_get.json()
-                            print("Response Data:", response_data)
+                            # print("Response Data:", response_data)
                         except ValueError:
                             flash("Invalid response format from API.", "error")
                             print("Raw Response Text:", r_get.text)

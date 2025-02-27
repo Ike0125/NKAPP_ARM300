@@ -11,6 +11,7 @@ from nkapp.api.kabudball3 import JQDB3
 from nkapp.api.kabudb import retrieve_kabudb_request
 from nkapp.api.statements import JQST
 from nkapp.set.set_print_statements import SETPR
+
 #  Blueprintのインスタンス作成
 bp_set = Blueprint("set", __name__, template_folder="templates")
 
@@ -90,7 +91,6 @@ def mock_kabudball_action():
     Kabudbリクエストを処理し、データを取得して保存する。
     """
     JQDB3.retrieve_kabudball_request(mode=9)
-    # JQDB.update_tradingcalendar()
 
     return redirect(url_for("set.main"))
 
@@ -110,9 +110,7 @@ def set_print_statement1():
     """
     statementsのprint処理
     """
-    # SETPR.set_print_statement1()
 
-    # return redirect(url_for("set.main"))
     return SETPR.set_print_statement1()
 
 

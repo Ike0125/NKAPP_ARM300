@@ -88,8 +88,6 @@ class SETPR:
                 # セッションを閉じる
                 db_session.close()
 
- 
-
         return
 
 
@@ -236,4 +234,3 @@ class SETPR:
                 session.close()
 
             return redirect(url_for("set.main"))
-    

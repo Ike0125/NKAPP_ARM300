@@ -1,5 +1,4 @@
 """  nkapp.rpt.report.py  """
-# from flask import render_template
 from math import ceil
 from datetime import datetime, timedelta
 from flask import request
@@ -7,7 +6,6 @@ from sqlalchemy import func, text, and_
 from sqlalchemy import select, desc
 from nkapp.models import Session, Tl
 from nkapp.rpt.models import VT
-# from nkapp.config import Reportparams, Config
 
 
 class Analysisparams:
@@ -120,7 +118,6 @@ class Analysisparams:
         """Params for listed_info"""
         config = Analysisparams.config()
         info = Tl.info_table  # table_info
-        # daily = Tl.daily_all_table
         per_page = config["per_page"]
         page = request.args.get("page", 1, type=int)
         with Session() as session:  # セッション開始
@@ -137,14 +134,8 @@ class Analysisparams:
                 initial = 1         # initial:1
             else:
                 # 曖昧検索用にワイルドカードを追加
-                # wildcard_filter1 = f"%{filter_query1}%"
-                # condition1 = text(wildcard_filter1)
                 condition1 = text(filter_query1)
-                # sq_condition1 = text(filter_query1)
-                # cord_queryと一致するレコードの全columnを選択
-                # base_query = sq_condition1
                 base_query = select(info.c).where(condition1)
-                # base_query = select(daily.c).where(condition1)
                 print(f"SQL Query: {base_query}")
                 # 総レコード数を取得
                 # pylint: disable=not-callable
@@ -170,8 +161,6 @@ class Analysisparams:
     def filter2():                 #引数：companyname,page
         """Params for listed_info"""
         config = Analysisparams.config()
-        # info = Tl.info_table  # table_info
-        # daily = Tl.daily_all_table
         endpoint = "analysis.filter2"
         marketcode_query = "0111"
         end_day = datetime.strptime("2024-6-14", "%Y-%m-%d").date()
@@ -220,8 +209,6 @@ class Analysisparams:
                         .group_by(subquery2.c.deviation_rate)
                         .order_by(desc('deviation_rate'))
                 )
-                # print(f"base_query: {base_query}")
-                # print(f"marketcode_query: {marketcode_query}")
                 # 総レコード数を取得
                 # pylint: disable=not-callable
                 count_query = select(func.count()).select_from(base_query.subquery())
@@ -234,14 +221,11 @@ class Analysisparams:
                 # sqlalchemyクエリを実行し、全レコードを取得
                 lists = session.execute(paginated_query).fetchall()
                 # トータルページ数の計算
-                # print(f"db_data: {lists}")
                 total_pages = ceil(counts / per_page)
                 initial = 0
 
             filters = filter_query2
-            # print(f"page2: {page}")
         # 掲示板のパラメータ
-        # params = Analysisparams.params(lists,counts,total_pages,page,per_page,filters,initial)
         params = {
             "head_title": config["head_title"],
             "header_title": config["header_title"],
@@ -330,11 +314,3 @@ class Analysisparams:
         }
 
         return config_params
-        
-#    @staticmethod
-#    def ana_debug():
-        # print(f"Searching for companyname: {companyname_query}")
-        # print(f"SQL Query: {base_query}")
-        # print(f"Total count: {counts}")
-        # print(f"db_data: {lists}")
-        # print(f"page: {page}")

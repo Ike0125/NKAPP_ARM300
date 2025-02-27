@@ -6,7 +6,6 @@ import json
 import pandas as pd
 from sqlalchemy import func
 from sqlalchemy.engine.row import Row
-# from flask import session
 from flask import render_template
 from .models import Session, Tl
 from .analysis.analysis20 import Ana
@@ -50,9 +49,14 @@ class Mainparams:
                 last_update_all = session.query(
                     func.max(Tl.daily_all_table.c.date)
                 ).scalar()  # daily_quotes最終更新日
+                if last_update_all is None:
+                    last_update_all_value = "2020-01-01"
+                    last_update_all = datetime.datetime.strptime(last_update_all_value, "%Y-%m-%d").date()
                 last_update_jqcalendar = session.query(
                     func.max(Tl.jq_calendar.c.date)
                 ).scalar()  # jq_calendar最終更新日
+                if last_update_jqcalendar is None:
+                    last_update_jqcalendar = date.today()
                 start_daily = session.query(
                     func.min(Tl.daily_table.c.date)
                 ).scalar()  # daily_quotesスタート
@@ -62,9 +66,14 @@ class Mainparams:
                 last_update_statements = session.query(
                     func.max(Tl.statements_table.c.DisclosedDate)
                 ).scalar()  # statements最終更新日
+                if last_update_statements is None:
+                    last_update_statements = datetime.date.today()
+                    last_update_statements = last_update_statements.strftime("%Y-%m-%d")
                 start_statements = session.query(
                     func.min(Tl.statements_table.c.DisclosedDate)
                 ).scalar()  # statementsスタート
+                if start_statements is None:
+                    start_statements = "2020-01-01"
         current_time = Mainparams.get_current_time()
         db = Tl.current_db
         at_db = db.find('@')

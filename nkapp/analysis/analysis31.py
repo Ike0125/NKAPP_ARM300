@@ -1,5 +1,4 @@
 """  nkapp.analysis.testview.py  """
-# import os
 from decimal import Decimal
 from math import ceil
 from datetime import timedelta, datetime
@@ -9,7 +8,6 @@ from flask import redirect, url_for
 from sqlalchemy import func, and_, case, literal
 from sqlalchemy import select, desc, asc
 from sqlalchemy.orm import aliased
-# from sqlalchemy.engine.row import Row
 from nkapp.config import Fileparams, TD
 from nkapp.models import Session, Tl
 from nkapp.rpt.models import VT
@@ -160,12 +158,6 @@ class A31:
             session["paramquery222"] = request.form.get("param222", 1)
             # Group E
             session["sort_select501"] = request.form.get("dropdown501", "02")
-            #session["ckbox511"]   = "ckbox511" in request.form
-            #session["ckbox512"]   = "ckbox512" in request.form
-            #session["ckbox521"]   = "ckbox521" in request.form
-            #session["ckbox531"]   = "ckbox531" in request.form
-            #session["data521"] = request.form.get("data521", "")
-            #session["conf531"] = request.form.get("conf531", "")
         else:
             # 保存したデータの読み込み
             session["condition001"] = ana_config.get("condition001")
@@ -209,7 +201,6 @@ class A31:
             column_name     = "histgram"
             macd_short      = ana_config.get("macd_short_value", 7)
             macd_long       = ana_config.get("macd_long_value", 14)
-            # macd_signal     = ana_config.get("macd_signal_value", 9)
             comment102      = "MACD-GC"
             subject123      = "Short"
             subject223      = "Long"
@@ -245,12 +236,6 @@ class A31:
         data521      = ana_config.get("data521", "nkapp_df.csv")
         conf531      = ana_config.get("conf531", "nkapp_conf.json")
         file_path      = ana_config.get("file_path","")
-        print(f"ckxbox511-2: {ckbox511}")
-        # ckbox512       = session.get("ckbox512",False)
-        # ckbox521       = session.get("ckbox521",False)
-        # ckbox531       = session.get("ckbox531",False)
-        # data521        = session.get("data521", "")
-        # conf531        = session.get("conf531", "")
 
         # 掲示板へのデータまとめ
         builder_params = {
@@ -332,7 +317,6 @@ class A31:
             "file_path": file_path,
             "error" : errormsg
         }
-        # print(f"builder_params: {builder_params}")
         # データの保存
         config_formula = Ana.load_config("ana_config.json")
         config_formula.update(builder_params)
@@ -351,7 +335,6 @@ class A31:
         errormsg    = ""
         subject541  = ""
         comment541  = ""
-        # base_name   = ""
         stamp = True
         index = False
         ana_config = Ana.load_config("ana_config.json")
@@ -360,7 +343,7 @@ class A31:
             page = 1
         else:
             page = request.args.get("page", 1, type=int)
-        with Session() as session:  # セッション開始
+        with Session() as db_session:  # セッション開始
             if request.method != "POST" and "page" not in request.args:
                 counts = 0
                 total_pages = 0
@@ -393,7 +376,6 @@ class A31:
                 if condition001 == "0521":
                     macd_params = A31.ana_query_macd_gcdc(page)
                     lists = base_query                          #queried data
-                    # print(f"lists: {lists}")
                     counts = macd_params["counts"]              # total counts
                     total_pages = macd_params["total_pages"]    # total_pages
                     page = macd_params["page"]                  # Current Page Number
@@ -403,7 +385,7 @@ class A31:
                     # pylint: disable=not-callable
                     count_query = select(func.count()).select_from(base_query.subquery())
                     # base_queryをサブクエリとし、その結果の行数をカウント
-                    counts = session.execute(count_query).scalar()
+                    counts = db_session.execute(count_query).scalar()
                     # オフセット計算
                     # print(f"counts: {counts}")
                     offset = (page - 1) * per_page
@@ -411,7 +393,7 @@ class A31:
                     # ページネーションをオフセット値と１ページ当りのレコード数より設定
                     paginated_query = base_query.offset(offset).limit(per_page)
                     # sqlalchemyクエリを実行し、全レコードを取得
-                    lists = session.execute(paginated_query).fetchall()
+                    lists = db_session.execute(paginated_query).fetchall()
                     # トータルページ数の計算
                     total_pages = ceil(counts / per_page)
                     initial = 0
@@ -452,7 +434,7 @@ class A31:
             else:
                 stamp = False
             # Data取得
-            data = session.query(aliased_subquery).all()
+            data = db_session.query(aliased_subquery).all()
             # Data保存
             Fileparams.save_csv(data, base_name, index ,stamp)
             # メッセージ読み出し
@@ -490,7 +472,7 @@ class A31:
         marketcode_condition = ""
         status      = ""
         errormsg    = ""
-        file_path   = ""
+        # file_path   = ""
 
         ana_config = Ana.load_config("ana_config.json")
         marketcategory       = ana_config.get("marketcategory")
@@ -503,9 +485,9 @@ class A31:
         day_gap = 0
         key_column = "code"
 
-        with Session() as session:
+        with Session() as db_session:
             # 取引カレンダーから最新の取引日を取得
-            last_trade_date = session.query(
+            last_trade_date = db_session.query(
                 func.max(Tl.daily_all_table.c.date)
             ).scalar()
 
@@ -513,23 +495,15 @@ class A31:
             t_date = last_trade_date
             end_day_no = TD.date_tno(t_date) - day_gap
 
-            # end_day_no = session.query(
-            #    Tl.t_calendar.c.trade_date_no
-            # ).filter(Tl.t_calendar.c.tradingdate == last_trade_date).scalar() - day_gap
-
             # 取引日カレンダーから具体的な取引日を取得
             t_no = end_day_no
             end_day = TD.tno_tdate(t_no)
 
-            #end_day = session.query(
-            #    Tl.t_calendar.c.tradingdate
-            #).filter(Tl.t_calendar.c.trade_date_no == end_day_no).scalar()
-
-            print(f"last_trade_date : {last_trade_date}")
-            print(f"end_day_no     : {end_day_no}")
-            print(f"trading_date: {end_day}")
-            print(type(end_day))
-            print(f"day_gap     : {day_gap}")
+            # print(f"last_trade_date : {last_trade_date}")
+            # print(f"end_day_no     : {end_day_no}")
+            # print(f"trading_date: {end_day}")
+            # print(type(end_day))
+            # print(f"day_gap     : {day_gap}")
 
             if marketcategory == "Market Code":
                 marketcode_condition = (Tl.company.marketcode == marketcode_query)
@@ -545,13 +519,13 @@ class A31:
                     status      = custom_a.get("status","")
                     df_custom_data = custom_a.get("data",{})
                     errormsg    = custom_a.get("errormsg","")
-                    print(f"custom_data: {df_custom_data}")
-                    print(f"status: {status}")
-                    print(f"file_path: {file_path}")
-                    print(f"Error Message: {errormsg}")
+                    # print(f"custom_data: {df_custom_data}")
+                    # print(f"status: {status}")
+                    # print(f"file_path: {file_path}")
+                    # print(f"Error Message: {errormsg}")
                     custom_code = df_custom_data["code"].astype(str).tolist()  # 数値を文字列に変換
                     marketcode_condition = Tl.company.code.in_(custom_code)  # SQLAlchemyのin_演算子を使用
-                    print(f"custom_code: {custom_code}")
+                    # print(f"custom_code: {custom_code}")
                 else:
                     params={
                         status   : "Notice",
@@ -582,9 +556,9 @@ class A31:
                 .order_by(A31.get_sort_order(
                     ana_sort, getattr(Tl.company, key_column)))
             )
-        print(f"marketcode_condition: {marketcode_condition}")
-        basequery_data = session.execute(base_query).fetchall()
-        print(f"base_query rows: {len(basequery_data)}")
+        # print(f"marketcode_condition: {marketcode_condition}")
+        basequery_data = db_session.execute(base_query).fetchall()
+        # print(f"base_query rows: {len(basequery_data)}")
 
         # print(f"base_query: {base_query}")
         return base_query
@@ -596,8 +570,6 @@ class A31:
         ana_config = Ana.load_config("ana_config.json")
         config31 = A31.config()
         per_page = config31["per_page"]
-        # marketcode_query = ana_config.get("marketcode")
-        # ana_sort = ana_config.get("sort_select501")
         day_gap_A = 0
         key_column = "histogram"
 
@@ -605,14 +577,14 @@ class A31:
         long_window = int(ana_config.get("macd_long_value"))     # 長期EMA期間
         signal_window = int(ana_config.get("macd_signal_value"))  # シグナルライン期間
 
-        with Session() as session:
+        with Session() as db_session:
             # 最新の取引日を取得
-            last_trade_date = session.query(
+            last_trade_date = db_session.query(
                 func.max(Tl.daily_all_table.c.date)
             ).scalar()
 
             # 取引日番号を計算
-            end_day_A_no = session.query(
+            end_day_A_no = db_session.query(
                 Tl.t_calendar.c.trade_date_no
             ).filter(Tl.t_calendar.c.tradingdate == last_trade_date).scalar() - day_gap_A
 
@@ -620,11 +592,11 @@ class A31:
             start_day_no = end_day_A_no -((long_window*2) + signal_window)
 
             # 実際の取引日を取得
-            end_day_A = session.query(
+            end_day_A = db_session.query(
                 Tl.t_calendar.c.tradingdate
             ).filter(Tl.t_calendar.c.trade_date_no == end_day_A_no).scalar()
 
-            start_day = session.query(
+            start_day = db_session.query(
                 Tl.t_calendar.c.tradingdate
             ).filter(Tl.t_calendar.c.trade_date_no == start_day_no).scalar()
 
@@ -638,26 +610,14 @@ class A31:
             subquery = A31.ana_query_mkt().subquery()
             aliased_subquery = aliased(subquery)
 
-            # marketcode_condition = case(
-            #    (literal(marketcode_query) == "0100", True),
-            #    else_=Tl.company.marketcode == marketcode_query,
-            #)
-
             # 銘柄コードと会社名を取得
-            companies = session.execute(
+            companies = db_session.execute(
                 select(
                     aliased_subquery.c.code,
                     Tl.company.code,
                     Tl.company.companyname
                 ).join(aliased_subquery, aliased_subquery.c.code == Tl.company.code)
             ).fetchall()
-
-            # companies = session.execute(
-            #    select(
-            #        Tl.company.code,
-            #        Tl.company.companyname
-            #    ).where(marketcode_condition)
-            #).fetchall()
 
             # 銘柄コードのリストを作成
             codes = [company.code for company in companies]
@@ -773,14 +733,14 @@ class A31:
         day_gap = int(ana_config.get("gapquery101"), 0)
         ana_param32 = float(ana_config.get("paramquery103"))
         key_column = "deviation_rate"
-        print(f"marketcode_query: {marketcode_query}")
-        print(f"operator: {operator}")
-        print(f"ana_sort: {ana_sort}")
-        print(f"window: {window}")
-        print(f"day_gap: {day_gap}")
-        print(f"ana_param32: {ana_param32}")
-        with Session() as session:
-            last_update = session.query(func.max(Tl.daily_table.c.date)).scalar()
+        # print(f"marketcode_query: {marketcode_query}")
+        # print(f"operator: {operator}")
+        # print(f"ana_sort: {ana_sort}")
+        # print(f"window: {window}")
+        # print(f"day_gap: {day_gap}")
+        # print(f"ana_param32: {ana_param32}")
+        with Session() as db_session:
+            last_update = db_session.query(func.max(Tl.daily_table.c.date)).scalar()
             end_day = last_update - timedelta(days=day_gap)
             start_day = end_day - timedelta(days=window * 2)
             # marketcodeの条件を動的に設定
@@ -798,7 +758,6 @@ class A31:
                 .where(marketcode_condition)
                 .subquery()
             )
-        # print(f"subquery: {subquery}")
 
         subquery2 = (
             select(
@@ -813,7 +772,6 @@ class A31:
             .where(and_(Tl.daily.date >= start_day, Tl.daily.date <= end_day))
             .subquery()
         )
-        # print(f"subquery2: {subquery2}")
 
         base_query = (
             select(subquery.c.code, subquery.c.companyname, subquery2.c.deviation_rate)
@@ -829,7 +787,6 @@ class A31:
             )
             .order_by(A31.get_sort_order(ana_sort, getattr(subquery2.c, key_column)))
         )
-        # print(f"base_query: {base_query}")
         return base_query
 
 
@@ -837,15 +794,14 @@ class A31:
     def ana_query_madev():
         """querybuilder for moving average"""
         ana_config = Ana.load_config("ana_config.json")
-        # marketcode_query = ana_config.get("marketcode")
         operator = ana_config.get("ope_select131")
         ana_sort = ana_config.get("sort_select501")
         window = int(ana_config.get("window101"))
         day_gap = int(ana_config.get("gapquery111"))
         ana_param32 = float(ana_config.get("paramquery221"))
         key_column = "deviation_rate"
-        with Session() as session:
-            last_trade_date = session.query(func.max(Tl.daily_all_table.c.date)).scalar()
+        with Session() as db_session:
+            last_trade_date = db_session.query(func.max(Tl.daily_all_table.c.date)).scalar()
 
             t_date = last_trade_date
             end_day_no = TD.date_tno(t_date) - day_gap
@@ -856,20 +812,18 @@ class A31:
             start_day_no = end_day_no-(window *2)
             t_no = start_day_no
             start_day = TD.tno_tdate(t_no)
-            # end_day = last_update - timedelta(days=day_gap)
-            # start_day = end_day - timedelta(days=window * 2)
-            print(f"last_trade_date : {last_trade_date}")
-            print(f"end_day_no      : {end_day_no}")
-            print(f"end_day         : {end_day}")
-            print(f"start_day       : {start_day}")
-            print(f"day_gap         : {day_gap}")
-            print(f"window          : {window}")
+            # print(f"last_trade_date : {last_trade_date}")
+            # print(f"end_day_no      : {end_day_no}")
+            # print(f"end_day         : {end_day}")
+            # print(f"start_day       : {start_day}")
+            # print(f"day_gap         : {day_gap}")
+            # print(f"window          : {window}")
 
             subquery = A31.ana_query_mkt().subquery()
             aliased_subquery = aliased(subquery)
 
-            print(f"type of subquery : {type(subquery)}")
-            print(f"culumn keys of subquery : {subquery.columns.keys()}")
+            # print(f"type of subquery : {type(subquery)}")
+            # print(f"culumn keys of subquery : {subquery.columns.keys()}")
 
             subquery2 = (
                 select(
@@ -883,38 +837,6 @@ class A31:
                 .where(and_(Tl.daily.date >= start_day, Tl.daily.date <= end_day))
                 .subquery()
             )
-
-            # marketcodeの条件を動的に設定
-            #marketcode_condition = case(
-            #    (literal(marketcode_query) == "0100", True),  # "0100"の場合は常にTrue
-            #    else_=Tl.company.marketcode == marketcode_query,  # それ以外は通常の条件
-            #)
-
-            #subquery = (
-            #    select(
-            #        Tl.company.code,
-            #        Tl.company.companyname,
-            #        Tl.company.marketcode,
-            #    )
-            #    .where(marketcode_condition)
-            #    .subquery()
-            #)
-        # print(f"subquery: {subquery}")
-
-        #subquery2 = (
-        #    select(
-        #        Tl.daily.code,
-        #        Tl.daily.date,
-        #        Tl.daily.adjustmentclose,
-        #        VT.moving_average_deviation(window)[0].label(
-        #            f"ma_{window}"
-        #        ),  # 20日移動平均を計算
-        #        VT.moving_average_deviation(window)[1].label("deviation_rate"),
-        #    )
-        #    .where(and_(Tl.daily.date >= start_day, Tl.daily.date <= end_day))
-        #    .subquery()
-        #)
-        # print(f"subquery2: {subquery2}")
 
         base_query = (
             select(subquery.c.code, subquery.c.companyname, subquery2.c.deviation_rate)
@@ -930,7 +852,6 @@ class A31:
             )
             .order_by(A31.get_sort_order(ana_sort, getattr(subquery2.c, key_column)))
         )
-        # print(f"base_query: {base_query}")
         return base_query
 
 
@@ -952,9 +873,9 @@ class A31:
         print(f"long_window: {long_window}")
         print(f"signal_window: {signal_window}")
 
-        with Session() as session:
+        with Session() as db_session:
             # データ取得期間計算
-            last_update = session.query(func.max(Tl.daily_table.c.date)).scalar()
+            last_update = db_session.query(func.max(Tl.daily_table.c.date)).scalar()
             end_day = last_update - timedelta(days=day_gap)
             start_day = end_day - timedelta(days=long_window * 2)  # 必要な期間をカバー
 
@@ -1030,26 +951,15 @@ class A31:
         day_gap = int(ana_config.get("gapquery111", 0))
         ana_param32 = float(ana_config.get("paramquery221"))
 
-        with Session() as session:
-            last_trade_date = session.query(func.max(Tl.daily_all_table.c.date)).scalar()
+        with Session() as db_session:
+            last_trade_date = db_session.query(func.max(Tl.daily_all_table.c.date)).scalar()
             end_day_no = TD.date_tno(last_trade_date) - day_gap
             end_day = TD.tno_tdate(end_day_no)
             start_day_no = end_day_no-(window *2)
             start_day = TD.tno_tdate(start_day_no)
-            # last_update = session.query(func.max(Tl.daily_table.c.date)).scalar()
-            # end_day = last_update - timedelta(days=day_gap)
-            # start_day = end_day - timedelta(days=window * 2)  # 必要な期間をカバー
-            # print(f"End day for analysis: {end_day}")
-            # print(f"start day: {start_day}")
             # marketcodeの条件設定
             subquery = A31.ana_query_mkt().subquery()
             aliased_subquery = aliased(subquery)
-
-
-            #if marketcode_query == "0100":
-            #    marketcode_condition = True  # 全市場対象
-            #else:
-            #    marketcode_condition = Tl.company.marketcode == marketcode_query
             # Tl.companyとTl.dailyを結合し、必要なデータを取得
             base_query = (
                 select(
@@ -1065,7 +975,6 @@ class A31:
                 .where(Tl.daily.date >= start_day, Tl.daily.date <= end_day)
                 .subquery()
             )
-            # print(f"Number of records in base_query: {base_query}")
             # lag値を計算するサブクエリを作成
             lag_query = select(
                 base_query.c.code,
@@ -1076,7 +985,6 @@ class A31:
                 .over(partition_by=base_query.c.code, order_by=base_query.c.date)
                 .label("lag_value"),
             ).subquery()
-            # print(f"lag_query: {lag_query}")
             # lag_valueがNULLでない行を選択し、price_changeを計算
             rsi_query = (
                 select(
@@ -1115,7 +1023,6 @@ class A31:
                 rsi_query.c.date,
                 rsi_final.label("rsi_final"),
             ).subquery()
-            # print(f"final_query: {final_query}")
             # フィルタリングとソート
             result_query = (
                 select(
@@ -1127,19 +1034,12 @@ class A31:
                 .where(final_query.c.rsi_final.op(operator)(ana_param32))
                 .order_by(A31.get_sort_order(ana_sort, final_query.c.rsi_final))
             )
-            # print(f"result_query: {result_query}")
-            # print(f"Base query count: {session.execute(select(func.count()).select_from(base_query)).scalar()}")
-            # print(f"Lag query count: {session.execute(select(func.count()).select_from(lag_query)).scalar()}")
-            # print(f"RSI query count: {session.execute(select(func.count()).select_from(rsi_query)).scalar()}")
-            # print(f"Final query count: {session.execute(select(func.count()).select_from(final_query)).scalar()}")
-            # print(f"Result query count: {session.execute(select(func.count()).select_from(result_query)).scalar()}")
         return result_query
 
     @staticmethod
     def ana_query_magcdc(gcdc):
         """querybuilder for moving average Golden Cross"""
         ana_config = Ana.load_config("ana_config.json")
-        # marketcode_query = ana_config.get("marketcode")
         ana_sort = ana_config.get("sort_select501")
         short_window = int(
             ana_config.get("window101", 5)
@@ -1148,9 +1048,9 @@ class A31:
             ana_config.get("window201", 25)
         )  # 長期移動平均の日数（デフォルト25日）
         day_gap = int(ana_config.get("gapquery111", 0))  # 日付のギャップ
-        with Session() as session:
+        with Session() as db_session:
             # 取引カレンダーを使って取引日を計算する
-            last_trade_date = session.query(func.max(Tl.daily_all_table.c.date)).scalar()
+            last_trade_date = db_session.query(func.max(Tl.daily_all_table.c.date)).scalar()
             end_day_no = TD.date_tno(last_trade_date) - day_gap
             end_day = TD.tno_tdate(end_day_no)
             start_day_no = end_day_no-(long_window *2)
@@ -1165,29 +1065,6 @@ class A31:
 
             subquery = A31.ana_query_mkt().subquery()
             aliased_subquery = aliased(subquery)
-
-            # print(f"type of subquery : {type(subquery)}")
-            # print(f"culumn keys of subquery : {subquery.columns.keys()}")
-
-            # last_update = session.query(func.max(Tl.daily_table.c.date)).scalar()
-            # end_day = last_update - timedelta(days=day_gap)
-            # start_day = end_day - timedelta(days=long_window * 2)
-
-            # marketcodeの条件を動的に設定
-            #marketcode_condition = case(
-            #    (literal(marketcode_query) == "0100", True),  # "0100"の場合は常にTrue
-            #    else_=Tl.company.marketcode == marketcode_query,  # それ以外は通常の条件
-            #)
-
-            #subquery = (
-            #    select(
-            #        Tl.company.code,
-            #        Tl.company.companyname,
-            #        Tl.company.marketcode,
-            #    )
-            #    .where(marketcode_condition)
-            #    .subquery()
-            #)
 
             # 移動平均の計算
             subquery2 = (
@@ -1302,7 +1179,7 @@ class A31:
     def ana_query_mamt():
         """移動平均のモーメント"""
         ana_config = Ana.load_config("ana_config.json")
-        marketcode_query = ana_config.get("marketcode")
+        # marketcode_query = ana_config.get("marketcode")
         operator = ana_config.get("ope_select131")
         ana_sort = ana_config.get("sort_select501")
         window = int(ana_config.get("window101"))
@@ -1310,14 +1187,14 @@ class A31:
         day_gap_B = int(ana_config.get("gapquery211"))
         key_column = "deviation_rate"
 
-        with Session() as session:
+        with Session() as db_session:
             # 取引カレンダーから最新の取引日を取得
-            last_trade_date = session.query(
+            last_trade_date = db_session.query(
                 func.max(Tl.daily_all_table.c.date)
             ).scalar()
 
             # 取引日番号を使って取引日を計算
-            end_day_A_no = session.query(
+            end_day_A_no = db_session.query(
                 Tl.t_calendar.c.trade_date_no
             ).filter(Tl.t_calendar.c.tradingdate == last_trade_date).scalar() - day_gap_A
 
@@ -1325,15 +1202,15 @@ class A31:
             start_day_no = end_day_A_no - (window * 2)
 
             # 取引日カレンダーから具体的な取引日を取得
-            end_day_A = session.query(
+            end_day_A = db_session.query(
                 Tl.t_calendar.c.tradingdate
             ).filter(Tl.t_calendar.c.trade_date_no == end_day_A_no).scalar()
 
-            end_day_B = session.query(
+            end_day_B = db_session.query(
                 Tl.t_calendar.c.tradingdate
             ).filter(Tl.t_calendar.c.trade_date_no == end_day_B_no).scalar()
 
-            start_day = session.query(
+            start_day = db_session.query(
                 Tl.t_calendar.c.tradingdate
             ).filter(Tl.t_calendar.c.trade_date_no == start_day_no).scalar()
 
@@ -1346,23 +1223,8 @@ class A31:
             subquery = A31.ana_query_mkt().subquery()
             aliased_subquery = aliased(subquery)
 
-            # marketcodeの条件を動的に設定
-            #marketcode_condition = case(
-            #    (literal(marketcode_query) == "0100", True),  # "0100"の場合は常にTrue
-            #    else_=Tl.company.marketcode == marketcode_query,  # それ以外は通常の条件
-            #)
-
-            #subquery = (
-            #    select(
-            #        Tl.company.code,
-            #        Tl.company.companyname,
-            #        Tl.company.marketcode,
-            #    )
-            #    .where(marketcode_condition)
-            #    .subquery()
-            #)
-            subquery_data = session.execute(select(subquery)).fetchall()
-            print(f"subquery rows: {len(subquery_data)}")
+            subquery_data = db_session.execute(select(subquery)).fetchall()
+            # print(f"subquery rows: {len(subquery_data)}")
 
             subquery2 = (
                 select(
@@ -1378,15 +1240,11 @@ class A31:
                     VT.moving_average_deviation(window)[1].label("deviation_rate"),
                 )
                 .join(aliased_subquery, aliased_subquery.c.code == Tl.daily.code)
-                #.join(
-                #    subquery,  # subqueryと結合
-                #    subquery.c.code == Tl.daily.code
-                #)
                 .where(and_(Tl.daily.date >= start_day, Tl.daily.date <= end_day_A))
                 .subquery()
             )
-            subquery2_data = session.execute(select(subquery2)).fetchall()
-            print(f"subquery2 rows: {len(subquery2_data)}")
+            subquery2_data = db_session.execute(select(subquery2)).fetchall()
+            # print(f"subquery2 rows: {len(subquery2_data)}")
 
             day_a_result = (
                 select(
@@ -1410,10 +1268,10 @@ class A31:
                 .subquery()
             )
 
-            day_a_data = session.execute(select(day_a_result)).fetchall()
-            print(f"day_a_result rows: {len(day_a_data)}")
+            day_a_data = db_session.execute(select(day_a_result)).fetchall()
+            # print(f"day_a_result rows: {len(day_a_data)}")
 
-            day_b_data = session.execute(select(day_b_result)).fetchall()
+            day_b_data = db_session.execute(select(day_b_result)).fetchall()
             print(f"day_b_result rows: {len(day_b_data)}")
             # print(f"Operator: {operator}")
 
@@ -1446,13 +1304,6 @@ class A31:
                 )
                 .order_by(A31.get_sort_order(ana_sort, getattr(subquery2.c, key_column)))
             )
-            # results = session.execute(base_query).fetchall()
-            # count = 0
-            # for row in results:
-            #    if count >= 20:  # 20行出力したらループを終了
-            #        break
-            #    print(f"Code: {row.code}, MA Day A: {row.ma_day_A}, MA Day B: {row.ma_day_B}")
-            #    count += 1
             return base_query
 
 

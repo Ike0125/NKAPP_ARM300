@@ -88,7 +88,7 @@
         </form>
         <!-- All Data Retrieval Section -->
         <h3>All Sock Data Retrieval</h3>
-        <p>DB: Last Updated: {{ last_update_all }} ; {{ record_count_all }} records </p>
+        <p>DB: {{start_daily_all}} to {{ last_update_all }} ; {{ record_count_all }} records </p>
         <form action="{{ url_for('api.kabudball_update_date') }}" method="post">
           <label for="date1">Date-1:</label>
           <input type="text" id="date1" name="date1" value= {{date1_value}} required><br>
@@ -100,7 +100,7 @@
           <h4>Options</h4>
         </div>
         <div class="child">
-          <p>DB: Last Updated: {{ last_update_all }} ; {{ record_count_all }} records </p>
+          <p>DB: {{start_daily_all}} to {{ last_update_all }} ; {{ record_count_all }} records </p>
           <h5>Original w/check</h5>
           <form action="{{ url_for('api.kabudball_action') }}" method="post">
               <button type="submit">update</button>

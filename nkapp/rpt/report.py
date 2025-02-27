@@ -3,7 +3,7 @@
 from math import ceil
 from datetime import datetime, timedelta
 from flask import request
-from sqlalchemy import select, func
+from sqlalchemy import select, func, desc
 from sqlalchemy.orm import aliased
 from nkapp.models import Session, Tl
 from nkapp.config import Reportparams, Config
@@ -287,9 +287,8 @@ class Infoparams:
         with Session() as session:  # セッション開始
             #  HTTPリクエストからcodeを取得
             code_query = request.args.get("code", "")
-            # code_query = "15700"
             # cord_queryと一致するレコードの全columnを選択
-            base_query = select(info.c).where(info.c.code == code_query)
+            base_query = select(info.c).where(info.c.code == code_query).order_by(desc(info.c.date))
             # 総レコード数を取得
             # pylint: disable=not-callable
             count_query = select(func.count()).select_from(base_query.subquery())

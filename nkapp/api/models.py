@@ -2,7 +2,8 @@
 from sqlalchemy import create_engine, Column, Integer, Float, String, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from .config import Config
+from nkapp.api.config import Config
+
 # データベースエンジンの作成
 engine = create_engine(Config.SQL_DataBase1, echo=True)
 

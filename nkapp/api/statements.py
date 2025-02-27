@@ -1,3 +1,4 @@
+""" statements.py """
 import time
 from datetime import datetime, timedelta
 from time import sleep
@@ -30,7 +31,7 @@ class JQST:
         base_url = Config.JQ_Statements_URL
         main_params = Mainparams.get_main_params()
         current_day  = datetime.now().date()
-        update_gap =83
+        update_gap = 0
 
         if request.method == "POST":
             st_date_start = request.form.get("st_date1","2024-01-01")
@@ -45,10 +46,10 @@ class JQST:
                 start_statements         = main_params["start_statements"]
                 last_update_statements = datetime.strptime(last_update_statements, "%Y-%m-%d").date()
                 start_statements = datetime.strptime(start_statements, "%Y-%m-%d").date()
-
+                #start_statements = None
                 if start_statements is None:
                     last_update_statements = current_day-timedelta(days=update_gap)
-                    start_statements = last_update_statements-timedelta(days=(2*365))
+                    start_statements = last_update_statements-timedelta(days=(5*365))
                 else:
                     if (date_start_obj <= last_update_statements) and (date_end_obj >= start_statements):
                         flash(f"Input Date for mode 8or 9 between {date_start_obj} & {date_end_obj} is out of range.", "error" )
@@ -64,7 +65,6 @@ class JQST:
             while date_obj <= date_end_obj:
                 date_obj_str = date_obj.strftime("%Y-%m-%d")
                 params = {"date": date_obj_str}
-                # params = {"code":"72030","date": date_obj_str}
                 print(f"date_obj:{date_obj}")
                 print(f"date_end_obj:{date_end_obj}")
                 start_time2 = time.time()
@@ -102,7 +102,6 @@ class JQST:
             try:
                 response_data = []  # 全データを格納するリスト
                 while True:
-                    # print(f"params:{params}")
                     if mode == 9:    # mock test
                         # APIリクエスト(モックテスト)
                         r_get = MK.mock_jquants_api(

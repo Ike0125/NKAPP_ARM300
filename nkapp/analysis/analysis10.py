@@ -139,8 +139,6 @@ class Analysisparams10:
             "paramquery31": paramquery31,  # 何日前params
             "paramquery32": paramquery32,  # 計算params
         }
-        # print(f"builder_params: {builder_params}")
-        # return builder_params
         return builder_params
 
     @staticmethod
@@ -149,20 +147,14 @@ class Analysisparams10:
         config = Analysisparams10.config()
         start_time = datetime.now()
         column_name = ""
-        # builder = Analysisparams10.querybuilder()
         builders = builder_params
         per_page = config["per_page"]
         if request.method == "POST":
             page = 1
         else:
             page = request.args.get("page", 1, type=int)
-        # print(f"builder_params: {builders}")
         with Session() as session:  # セッション開始
             # 初期表示時は空の結果を返す
-            # is_initial_request = not bool(request.args.get("filter2", "").strip())
-            # if is_initial_request or not request.args.get("filter2", "").strip():
-            print(f"page1: {page}")
-            # if request.method != "POST":
             if request.method != "POST" and "page" not in request.args:
                 lists = []
                 counts = 0
@@ -182,7 +174,6 @@ class Analysisparams10:
                     return {"error": "クエリの生成に失敗しました"}
                 if base_query is None:
                     return {"error": "クエリの生成に失敗しました"}
-                # print(f"base_query: {base_query}")
                 # 総レコード数を取得
                 # pylint: disable=not-callable
                 count_query = select(func.count()).select_from(base_query.subquery())
@@ -198,11 +189,8 @@ class Analysisparams10:
                 # sqlalchemyクエリを実行し、全レコードを取得
                 lists = session.execute(paginated_query).fetchall()
                 # トータルページ数の計算
-                # print(f"db_data: {lists}")
                 total_pages = ceil(counts / per_page)
                 initial = 0
-                # print(f"page2: {page}")
-                # print(f"lists: {lists}")
         # 掲示板のパラメータ
         params = Analysisparams10.params(
             column_name, lists, counts, total_pages, page, per_page, initial
@@ -210,7 +198,6 @@ class Analysisparams10:
         end_time = datetime.now()
         query_time = end_time - start_time
         print(f"Query_time: {query_time}")
-        # print(f"params: {params}")
         return params
 
     @staticmethod
@@ -242,7 +229,6 @@ class Analysisparams10:
                 .where(marketcode_condition)
                 .subquery()
             )
-        # print(f"subquery: {subquery}")
 
         subquery2 = (
             select(
@@ -257,7 +243,6 @@ class Analysisparams10:
             .where(and_(Tl.daily.date >= start_day, Tl.daily.date <= end_day))
             .subquery()
         )
-        # print(f"subquery2: {subquery2}")
 
         base_query = (
             select(subquery.c.code, subquery.c.companyname, subquery2.c.deviation_rate)
@@ -277,7 +262,6 @@ class Analysisparams10:
                 )
             )
         )
-        # print(f"base_query: {base_query}")
         return base_query
 
     @staticmethod
@@ -289,7 +273,6 @@ class Analysisparams10:
         window = int(builders["paramquery21"])
         day_gap = int(builders["paramquery31"])
         ana_param32 = float(builders["paramquery32"])
-        # key_column = builders["selected41"]
         key_column = f"rsi_{window}"
         with Session() as session:
             last_update = session.query(func.max(Tl.daily_table.c.date)).scalar()
@@ -310,20 +293,7 @@ class Analysisparams10:
                 .where(marketcode_condition)
                 .subquery()
             )
-        # print(f"subquery: {subquery}")
         rsi_query = VT.rsi(window).subquery("rsi_subquery")
-
-        # subquery2 = (
-        #    select(
-        #        Tl.daily.code,
-        #        Tl.daily.date,
-        #        Tl.daily.adjustmentclose,
-        #        rsi_query.c[f"rsi_{window}"]
-        #    )  # RSIを計算
-        #    .where(and_(Tl.daily.date >= start_day, Tl.daily.date <= end_day))
-        #    .subquery()
-        # )
-        # print(f"subquery2: {subquery2}")
 
         base_query = (
             select(
@@ -340,8 +310,6 @@ class Analysisparams10:
                 )
             )
         )
-        # print(f"base_query: {base_query}")
-        # print(f"RSI:rsi_{window}")
         return base_query
 
     @staticmethod
@@ -362,8 +330,8 @@ class Analysisparams10:
             end_day = last_update - timedelta(days=day_gap)
             start_day = end_day - timedelta(days=long_window * 2)  # 必要な期間をカバー
 
-            print(f"End day for analysis: {end_day}")
-            print(f"start day: {start_day}")
+            # print(f"End day for analysis: {end_day}")
+            # print(f"start day: {start_day}")
 
             # marketcodeの条件設定
             if marketcode_query == "0100":
@@ -433,7 +401,6 @@ class Analysisparams10:
         window = int(builders["paramquery21"])
         day_gap = int(builders["paramquery31"])
         ana_param32 = float(builders["paramquery32"])
-        # key_column = f"rsi_{window}"
 
         with Session() as session:
             last_update = session.query(func.max(Tl.daily_table.c.date)).scalar()
@@ -465,7 +432,6 @@ class Analysisparams10:
                 )
                 .subquery()
             )
-            # print(f"Number of records in base_query: {base_query}")
 
             # **修正ポイント1：lag値を計算するサブクエリを作成**
             lag_query = select(
@@ -477,7 +443,6 @@ class Analysisparams10:
                 .over(partition_by=base_query.c.code, order_by=base_query.c.date)
                 .label("lag_value"),
             ).subquery()
-            # print(f"lag_query: {lag_query}")
             # **修正ポイント2：lag_valueがNULLでない行を選択し、price_changeを計算**
             rsi_query = (
                 select(
@@ -510,16 +475,6 @@ class Analysisparams10:
                 rows=(-(window - 1), 0),
             )
 
-            # RSIの計算（ゼロ除算を防ぐための条件分岐を追加）
-            # pylint: disable=not-callable
-            # rs = func.coalesce(avg_gain / func.nullif(avg_loss, 0), 0)
-            # rsi_value = case(
-            #    (avg_loss == 0, 100),
-            #    (avg_gain == 0, 0),
-            #    else_=100 - (100 / (1 + rs))
-            # ).label('rsi_value')
-            # rsi_final = func.coalesce(rsi_value, 50).label('rsi_final')
-            # print(f"rsi_final_data: {rsi_final}")
             rs = case((avg_loss != 0, avg_gain / avg_loss), else_=0).label("rs")
 
             rsi_final = 100 - (100 / (1 + rs))
@@ -531,7 +486,6 @@ class Analysisparams10:
                 rsi_query.c.date,
                 rsi_final.label("rsi_final"),
             ).subquery()
-            # print(f"final_query: {final_query}")
             # フィルタリングとソート
             result_query = (
                 select(
@@ -545,7 +499,6 @@ class Analysisparams10:
                     Analysisparams10.get_sort_order(ana_sort, final_query.c.rsi_final)
                 )
             )
-            # print(f"result_query: {result_query}")
             print(
                 f"Base query count: {session.execute(select(func.count()).select_from(base_query)).scalar()}"
             )
@@ -561,143 +514,6 @@ class Analysisparams10:
             print(
                 f"Result query count: {session.execute(select(func.count()).select_from(result_query)).scalar()}"
             )
-            # pylint: disable=not-callable
-            """
-            debug_query = (
-                select(
-                    rsi_query.c.code,
-                    rsi_query.c.date,
-                    avg_gain.label('avg_gain'),
-                    avg_loss.label('avg_loss'),
-                    rs.label('rs'),
-                    rsi_value.label('rsi_value'),
-                    rsi_final.label('rsi_final')
-                )
-                .where(rsi_query.c.date == end_day)
-                .limit(10)
-            )
-
-            debug_results = session.execute(debug_query).fetchall()
-            print("Debug RSI calculations:")
-            for row in debug_results:
-                print(row)
-
-            debug_query = (
-                select(
-                    final_query.c.code,
-                    final_query.c.date,
-                    final_query.c.rsi_final
-                )
-                .order_by(final_query.c.code, final_query.c.date)
-                .limit(20)
-            )
-
-            debug_results = session.execute(debug_query).fetchall()
-            print("Debug RSI calculations_Updated (final values):")
-            for row in debug_results:
-                print(row)
-
-            # price_changeの分布を確認
-            price_change_stats = (
-                select(
-                    func.min(rsi_query.c.price_change).label('min_change'),
-                    func.max(rsi_query.c.price_change).label('max_change'),
-                    func.avg(rsi_query.c.price_change).label('avg_change'),
-                    func.sum(case((rsi_query.c.price_change < 0, 1), else_=0)).label('negative_changes'),
-                    func.sum(case((rsi_query.c.price_change > 0, 1), else_=0)).label('positive_changes')
-                )
-            )
-            stats_result = session.execute(price_change_stats).first()
-            print(f"Price change stats: {stats_result}")
-
-            price_change_debug = (
-                select(
-                    lag_query.c.code,
-                    lag_query.c.date,
-                    lag_query.c.adjustmentclose,
-                    lag_query.c.lag_value,
-                    (lag_query.c.adjustmentclose - lag_query.c.lag_value).label('price_change')
-                )
-                .order_by(lag_query.c.code, lag_query.c.date)
-                .limit(20)
-            )
-
-            price_change_results = session.execute(price_change_debug).fetchall()
-            print("Price change calculation:")
-            for row in price_change_results:
-                print(row)
-
-            gain_loss_debug = (
-                select(
-                    rsi_query.c.code,
-                    rsi_query.c.date,
-                    rsi_query.c.price_change,
-                    case((rsi_query.c.price_change > 0, rsi_query.c.price_change), else_=0).label('gain'),
-                    case((rsi_query.c.price_change < 0, -rsi_query.c.price_change), else_=0).label('loss'),
-                    avg_gain,
-                    avg_loss
-                )
-                .order_by(rsi_query.c.code, rsi_query.c.date)
-                .limit(20)
-            )
-
-            gain_loss_results = session.execute(gain_loss_debug).fetchall()
-            print("Gain and Loss calculation:")
-            for row in gain_loss_results:
-                print(row)
-
-            window_function_debug = (
-                select(
-                    rsi_query.c.code,
-                    rsi_query.c.date,
-                    func.sum(
-                        case((rsi_query.c.price_change > 0, rsi_query.c.price_change), else_=0)
-                    ).over(
-                        partition_by=rsi_query.c.code,
-                        order_by=rsi_query.c.date,
-                        rows=(-(window-1), 0)
-                    ).label('sum_gain'),
-                    func.sum(
-                        case((rsi_query.c.price_change < 0, -rsi_query.c.price_change), else_=0)
-                    ).over(
-                        partition_by=rsi_query.c.code,
-                        order_by=rsi_query.c.date,
-                        rows=(-(window-1), 0)
-                    ).label('sum_loss')
-                )
-                .order_by(rsi_query.c.code, rsi_query.c.date)
-                .limit(20)
-            )
-
-            window_function_results = session.execute(window_function_debug).fetchall()
-            print("Window function operation:")
-            for row in window_function_results:
-                print(row)
-
-            rsi_final_debug = (
-                select(
-                    rsi_query.c.code,
-                    rsi_query.c.date,
-                    avg_gain,
-                    avg_loss,
-                    rs,
-                    rsi_value,
-                    rsi_final,
-                )
-                .order_by(rsi_query.c.code, rsi_query.c.date)
-                .limit(20)
-            )
-
-            rsi_final_results = session.execute(rsi_final_debug).fetchall()
-            print("Final RSI calculation:")
-            for row in rsi_final_results:
-                print(row)
-
-            result_sample = session.execute(result_query.limit(20)).fetchall()
-            print("Sample of final result:")
-            for row in result_sample:
-                print(row)
-            """
         return result_query
 
     @staticmethod

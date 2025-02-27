@@ -1,9 +1,5 @@
-"""  test_daily_print_list.py  """
-from flask import redirect, url_for
+"""  mocktest_mockjq_main.py  """
 from flask import flash, request, session
-from flask import render_template_string
-# from nkapp.models import Session
-from nkapp.config import Fileparams
 from nkapp.models import Tl
 
 

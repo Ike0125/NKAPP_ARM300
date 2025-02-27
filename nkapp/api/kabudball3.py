@@ -32,10 +32,10 @@ class JQDB3:
 
         start_time = time.time()
         print(f"Starting data retrieval process...:{start_time}")
-        with Session(engine) as session:
+        with Session(engine) as db_session:
             # 全銘柄リスト取得
             listed_info_stmt = select(ListedInfo.code)
-            all_codes = session.execute(listed_info_stmt).scalars().all()
+            all_codes = db_session.execute(listed_info_stmt).scalars().all()
             print(f"Fetched {len(all_codes)} codes.")
             for code in all_codes:
                 # データ取得
@@ -44,7 +44,7 @@ class JQDB3:
                 if response is None:
                     return redirect(url_for("set.main"))  # 処理停止し掲示板に戻る
                 # データ保存
-                JQDB3.save_to_database(session, response, mode=9)
+                JQDB3.save_to_database(db_session, response, mode=9)
                 elapsed_time2 = time.time() - start_time2
                 print(f"Data retrieval and storage : {code} in {elapsed_time2:.2f} seconds.")
                 # APIのリクエスト制限を考慮して少し待機
@@ -61,12 +61,10 @@ class JQDB3:
         base_url = Config.JQ_Daily_URL
         params = {"code": ",".join(kabu_code)}
         retries = 0
-        # print(f"mode2:{mode}")
         while retries <= max_retries:
             try:
                 all_data = []  # 全データを格納するリスト
                 while True:
-                    # print(f"params:{params}")
                     if mode == 9:    # mock test
                         # APIリクエスト(モックテスト)
                         r_get = MK.mock_jquants_api(
@@ -76,7 +74,6 @@ class JQDB3:
                     elif mode == 1:
                         # APIリクエスト
                         r_get = requests.get(base_url, headers=headers, params=params, timeout=10)
-                        # print(f"Request URL: {r_get.url}")
                     else:
                         print("Modeが設定されていません")
                         raise Exception
@@ -114,7 +111,7 @@ class JQDB3:
 
 
     @staticmethod
-    def save_to_database(session, response, mode=9):
+    def save_to_database(db_session, response, mode=9):
         """
         APIで取得した新規データをデータベースに保存。
         """
@@ -139,7 +136,7 @@ class JQDB3:
                         adjustmentclose=item["AdjustmentClose"],
                         adjustmentvolume=item["AdjustmentVolume"],
                     )
-                    session.add(new_quote)
+                    db_session.add(new_quote)
             elif mode == 9:    # mock test
                 for item in response:
                     new_quote = DailyQuotes(
@@ -160,13 +157,13 @@ class JQDB3:
                         adjustmentclose=item["AdjustmentClose"],
                         adjustmentvolume=item["AdjustmentVolume"],
                     )
-                    session.add(new_quote)
+                    db_session.add(new_quote)
             else:
                 print("Modeが設定されていません")
                 raise ValueError("mode isn't set.")
-            session.commit()  # 全データを一括でコミット
+            db_session.commit()  # 全データを一括でコミット
         except ValueError as e:
-            session.rollback()
+            db_session.rollback()
             flash(f"{str(e)}","error")
 
 
@@ -182,10 +179,10 @@ class JQDB3:
 
         start_time = time.time()
         print(f"Starting data retrieval process...:{start_time}")
-        with Session(engine) as session:
+        with Session(engine) as db_session:
             # 全銘柄リスト取得
             listed_info_stmt = select(ListedInfo.code)
-            all_codes = session.execute(listed_info_stmt).scalars().all()
+            all_codes = db_session.execute(listed_info_stmt).scalars().all()
             print(f"Fetched {len(all_codes)} codes.")
             for code in all_codes:
                 # データ取得
@@ -194,7 +191,7 @@ class JQDB3:
                 if response is None:
                     return redirect(url_for("set.main"))  # 処理停止し掲示板に戻る
                 # データ保存
-                JQDB3.save_to_database_update(session, response, mode=1)
+                JQDB3.save_to_database_update(db_session, response, mode=1)
                 elapsed_time2 = time.time() - start_time2
                 print(f"Data retrieval and storage : {code} in {elapsed_time2:.2f} seconds.")
                 sleep(0.1)  # 必要に応じて調整
@@ -203,7 +200,7 @@ class JQDB3:
 
 
     @staticmethod
-    def save_to_database_update(session, response, mode=1):
+    def save_to_database_update(db_session, response, mode=1):
         """
         APIで取得したデータをデータベースに保存。
         """
@@ -216,7 +213,7 @@ class JQDB3:
                         (DailyQuotesAll.date == datetime.strptime(item["Date"], "%Y-%m-%d").date())
                     )
 
-                    if not session.execute(existing_data_stmt).first():
+                    if not db_session.execute(existing_data_stmt).first():
                         new_quote = DailyQuotesAll(
                             date=datetime.strptime(item["Date"], "%Y-%m-%d").date(),
                             code=item["Code"],
@@ -235,7 +232,7 @@ class JQDB3:
                             adjustmentclose=item["AdjustmentClose"],
                             adjustmentvolume=item["AdjustmentVolume"],
                         )
-                        session.add(new_quote)
+                        db_session.add(new_quote)
                     else:
                         break
             elif mode == 9:    # mock test
@@ -267,13 +264,13 @@ class JQDB3:
                             adjustmentclose=item["AdjustmentClose"],
                             adjustmentvolume=item["AdjustmentVolume"],
                         )
-                        session.add(new_quote)
+                        db_session.add(new_quote)
                     else:
                         break
             else:
                 print("Modeが設定されていません")
                 raise ValueError("mode isn't set.")
-            session.commit()  # 全データを一括でコミット
+            db_session.commit()  # 全データを一括でコミット
         except ValueError as e:
             flash(f"{str(e)}","error")
 
@@ -281,14 +278,14 @@ class JQDB3:
     def update_tradingcalendar():
         """Updating Trading Calendar"""
         # Tl.daily_table から最新の日付を取得
-        with Session(engine) as session:
+        with Session(engine) as db_session:
             try:
                 daily      = Tl.daily         # DailyQuotesAll
                 #daily = Tl.dailyquotes  # DailyQuotes
                 t_calendar = Tl.t_calendar  # TradingCalendar
 
-                max_trade_date_no = session.query(func.max(TradingCalendar.trade_date_no)).scalar()
-                seq_current_value = session.execute(text("SELECT last_value FROM trade_date_no_seq")).scalar()
+                max_trade_date_no = db_session.query(func.max(TradingCalendar.trade_date_no)).scalar()
+                seq_current_value = db_session.execute(text("SELECT last_value FROM trade_date_no_seq")).scalar()
 
                 if max_trade_date_no is None:
                     max_trade_date_no = 0  # テーブルが空の場合
@@ -305,8 +302,8 @@ class JQDB3:
                                 f"Please manually reset the sequence to {max_trade_date_no + 1}."
                         )
                 # daily の最新日付を取得
-                d_date = session.query(func.max(daily.date)).scalar()
-                t_date = session.query(func.max(t_calendar.c.tradingdate)).scalar()
+                d_date = db_session.query(func.max(daily.date)).scalar()
+                t_date = db_session.query(func.max(t_calendar.c.tradingdate)).scalar()
 
                 if not d_date:
                     flash("No dates found in DailyQuotesAll. Aborting update.", "error")
@@ -315,7 +312,7 @@ class JQDB3:
                 if t_date is None:
                     # TradingCalendar が空の場合、初期データを挿入
                     flash("TradingCalendar is empty. Rebuilding with initial data.", "message")
-                    JQDB3._initialize_trading_calendar(session, daily, d_date)
+                    JQDB3._initialize_trading_calendar(db_session, daily, d_date)
                     return
 
                 # 更新が必要か確認
@@ -325,7 +322,7 @@ class JQDB3:
 
                 # TradingCalendar に追加する営業日を取得
                 trading_dates = (
-                    session.query(daily.date)
+                    db_session.query(daily.date)
                     .filter(daily.date > t_date, daily.date <= d_date)
                     .distinct()
                     .order_by(daily.date)
@@ -335,33 +332,33 @@ class JQDB3:
                 # TradingCalendar にデータを追加
                 for date in trading_dates:
                     new_entry = TradingCalendar(tradingdate=date[0])
-                    session.add(new_entry)
+                    db_session.add(new_entry)
 
                 # コミットして変更を保存
-                session.commit()
+                db_session.commit()
                 flash("Trading calendar has been updated to match daily_table.", "success")
 
             except SQLAlchemyError as e:
                 # ロールバックしてエラーを処理
-                session.rollback()
+                db_session.rollback()
                 flash(f"Database Connecting Error: {e}", "error")
             except ValueError as e:
                 print(f"Error: {e}")
                 flash(f"{e}:", "error")
             finally:
                 # セッションを閉じる
-                session.close()
+                db_session.close()
 
         return
 
 
     @staticmethod
-    def _initialize_trading_calendar(session, daily, d_date):
+    def _initialize_trading_calendar(db_session, daily, d_date):
         """Initialize Trading Calendar with data from DailyQuotesAll."""
         try:
             # `DailyQuotesAll` の営業日を取得
             trading_dates = (
-                session.query(daily.date)
+                db_session.query(daily.date)
                 .filter(daily.date <= d_date)
                 .distinct()  # ユニークな日付のみ
                 .order_by(daily.date)
@@ -374,14 +371,14 @@ class JQDB3:
             # 初期データを TradingCalendar に挿入
             for date in trading_dates:
                 new_entry = TradingCalendar(tradingdate=date[0])  # trade_date_no は自動生成
-                session.add(new_entry)
+                db_session.add(new_entry)
 
             # データベースに変更を保存
-            session.commit()
+            db_session.commit()
             flash("TradingCalendar has been initialized.", "success")
 
         except SQLAlchemyError as e:
-            session.rollback()
+            db_session.rollback()
             raise RuntimeError(f"Error initializing TradingCalendar: {e}") from e
 
 
@@ -402,7 +399,7 @@ class JQDB3:
         base_url = Config.JQ_Daily_URL
         main_params = Mainparams.get_main_params()
         current_day  = datetime.now().date()
-        update_gap =83
+        update_gap = 0
 
         if request.method == "POST":
             date_start = request.form.get("date1","2024-01-01")
@@ -417,10 +414,10 @@ class JQDB3:
                 start_daily     = main_params["start_daily"]
                 last_update_all = main_params["last_update_all"]
                 start_daily_all = main_params["start_daily_all"]
-                print(f"date_start_obj:{date_start_obj}")
-                print(f"last_update:{last_update}")
-                print(f"date_end_obj:{date_end_obj}")
-                print(f"start_daily:{start_daily}")
+                # print(f"date_start_obj:{date_start_obj}")
+                # print(f"last_update:{last_update}")
+                # print(f"date_end_obj:{date_end_obj}")
+                # print(f"start_daily:{start_daily}")
 
                 if start_daily is None:
                     last_update = current_day-timedelta(days=update_gap)
@@ -438,10 +435,10 @@ class JQDB3:
                         if (date_start_obj <= last_update_all) and (date_end_obj >= start_daily_all):
                             flash(f"Input Date between {date_start_obj} & {date_end_obj} is out of range.", "error" )
                             return redirect(url_for("api.api_main"))
-                print(f"date_start_obj:{date_start_obj}")
-                print(f"last_update:{last_update}")
-                print(f"date_end_obj:{date_end_obj}")
-                print(f"start_daily:{start_daily}")
+                # print(f"date_start_obj:{date_start_obj}")
+                # print(f"last_update:{last_update}")
+                # print(f"date_end_obj:{date_end_obj}")
+                # print(f"start_daily:{start_daily}")
 
             except ValueError:
                 flash("Invalid date format. Please use YYYY-MM-DD.", "error")
@@ -454,9 +451,9 @@ class JQDB3:
                 date_obj_str = date_obj.strftime("%Y-%m-%d")
                 params = {"date": date_obj_str}
                 # params = {"code":"72030","date": date_obj_str}
-                print(f"params:{params}")
-                print(f"date_obj:{date_obj}")
-                print(f"date_end_obj:{date_end_obj}")
+                # print(f"params:{params}")
+                # print(f"date_obj:{date_obj}")
+                # print(f"date_end_obj:{date_end_obj}")
                 start_time2 = time.time()
                 # データ取得
                 response = JQDB3.fetch_data(base_url, headers, params, mode, max_retries=1, retry_delay=3)
@@ -466,7 +463,7 @@ class JQDB3:
                 # print(f"response:{response}")
                 #JQDB3.save_to_db_update(response, mode)
                 db_commit = JQDB3.save_to_db_update(response, mode)
-                print(f"db_commit2:{db_commit}")
+                # print(f"db_commit2:{db_commit}")
 
                 if db_commit is False:
                     print(f"db_commit3:{db_commit}")
@@ -493,12 +490,10 @@ class JQDB3:
         mode 9 : DailyQuotes   , data check あり
         """
         retries = 0
-        # print(f"mode2:{mode}")
         while retries <= max_retries:
             try:
                 response_data = []  # 全データを格納するリスト
                 while True:
-                    # print(f"params:{params}")
                     if mode == 9:    # mock test
                         # APIリクエスト(モックテスト)
                         r_get = MK.mock_jquants_api(
@@ -507,7 +502,6 @@ class JQDB3:
                         print(f"r_get:{r_get.json()}")
                     elif mode in [1,2,8]:
                         # APIリクエスト
-                        # print(f"params: {params}")
                         r_get = requests.get(base_url, headers=headers, params=params, timeout=10)
                         response = r_get.json()
                         response_data += response.get("daily_quotes", [])
